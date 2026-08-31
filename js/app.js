@@ -1,0 +1,39 @@
+/**
+ * YAPPER — Token Compression & Prompt Translation Engine
+ * Main Application Bootstrap (MVC Entry Point)
+ */
+
+import { AppState } from './models/AppState.js';
+import { HistoryModel } from './models/HistoryModel.js';
+import { StudioView } from './views/StudioView.js';
+import { SettingsView } from './views/SettingsView.js';
+import { HistoryView } from './views/HistoryView.js';
+import { ToastView } from './views/ToastView.js';
+import { AppController } from './controllers/AppController.js';
+
+function bootstrap() {
+  const state = new AppState();
+  const historyModel = new HistoryModel();
+
+  const studioView = new StudioView();
+  const settingsView = new SettingsView();
+  const historyView = new HistoryView();
+  const toastView = new ToastView();
+
+  const app = new AppController({
+    state,
+    historyModel,
+    studioView,
+    settingsView,
+    historyView,
+    toastView
+  });
+
+  app.init();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrap);
+} else {
+  bootstrap();
+}
