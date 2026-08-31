@@ -1109,7 +1109,6 @@ Core Principles:
       }
     });
   }
-
   // --- Bootstrap ---
   function init() {
     loadConfig();

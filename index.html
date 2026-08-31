@@ -3,226 +3,262 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Yapper - AI Prompt Engineer & Token Compression Translator. Ubah prompt informal Indonesia menjadi system prompt bahasa Inggris yang padat, presisi, dan hemat token.">
-  <title>YAPPER — Token Compression & Prompt Translation</title>
+  <meta name="description" content="Yapper — Token Compression & Prompt Translation Engine. Transform raw informal Indonesian instructions into dense, high-signal English system prompts with minimal token overhead.">
+  <title>YAPPER — Prompt Compression Engine</title>
+  
+  <!-- Premium Typographic Fonts: Instrument Serif, Newsreader, Geist Sans, Geist Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2310b981'><path d='M13 2L3 14h9l-1 8 10-12h-9l1-8z'/></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23111111'><path d='M13 2L3 14h9l-1 8 10-12h-9l1-8z'/></svg>">
 </head>
 <body>
-  <!-- Ambient background layer -->
-  <div class="ambient-glow" aria-hidden="true"></div>
+  <!-- Subtle warm ambient background layer -->
+  <div class="ambient-layer" aria-hidden="true"></div>
 
   <!-- Header -->
   <header class="app-header">
     <div class="header-container">
       <div class="brand-group">
-        <div class="brand-logo" aria-label="Yapper Logo">
-          <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
-          </svg>
-        </div>
-        <div class="brand-text">
-          <div class="brand-title-wrap">
-            <h1 class="brand-title">YAPPER</h1>
-            <span class="brand-badge">COMPRESSOR v1.0</span>
+        <a href="#" class="brand-link" aria-label="Yapper Engine">
+          <div class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+            </svg>
           </div>
-          <p class="brand-subtitle">Indonesian Informal &rarr; High-Density English System Prompt</p>
-        </div>
+          <div class="brand-meta">
+            <span class="brand-name">YAPPER</span>
+            <span class="brand-version">COMPRESSION ENGINE</span>
+          </div>
+        </a>
       </div>
 
-      <div class="header-actions">
-        <div id="connection-status" class="status-indicator ready" title="Status Provider">
+      <div class="header-nav-actions">
+        <div id="connection-status" class="status-badge ready" title="Active Provider Status">
           <span class="status-dot"></span>
           <span id="status-text" class="status-label">Groq &middot; Ready</span>
         </div>
 
-        <button id="btn-history-toggle" class="btn-icon" title="Lihat Riwayat (⌘H)" aria-label="Riwayat Prompt">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        <button id="btn-history-toggle" class="btn-ghost-icon" title="View prompt history (⌘H)" aria-label="Prompt History">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
           </svg>
-          <span class="btn-tooltip">Riwayat (⌘H)</span>
+          <span class="btn-tooltip">History <kbd>⌘H</kbd></span>
         </button>
 
-        <button id="btn-settings-toggle" class="btn-pill" aria-label="Konfigurasi API Key">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button id="btn-settings-toggle" class="btn-settings-pill" aria-label="Configure API Keys and Models">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"></circle>
             <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"></path>
           </svg>
-          <span class="btn-pill-label">API Key</span>
-          <span id="key-badge" class="key-badge not-configured">Setup</span>
+          <span class="btn-settings-label">Settings</span>
+          <span id="key-badge" class="key-status-badge not-configured">Setup</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Main Container -->
-  <main class="main-content">
-    <!-- Translation Studio Grid -->
-    <div class="workspace-grid">
-      <!-- Left Panel: Indonesian Informal Input -->
-      <section class="panel panel-input" aria-labelledby="input-heading">
-        <div class="panel-header">
-          <div class="panel-meta">
-            <h2 id="input-heading" class="panel-title">
-              <span class="badge-lang">ID</span>
-              Informal / Raw Input
-            </h2>
-            <div class="stats-counter" id="input-stats">
-              <span id="input-tokens" class="counter-item">0 tok</span>
-              <span class="counter-sep">&middot;</span>
-              <span id="input-chars" class="counter-item">0 karakter</span>
+  <!-- Main App Workspace (Compact & Focused) -->
+  <main class="main-app-content">
+    <div class="app-workspace-container">
+      
+      <!-- Compact Editorial Title & Context -->
+      <div class="workspace-intro">
+        <div class="intro-left">
+          <span class="intro-kicker font-mono">[ TOKEN OPTIMIZATION &middot; SYSTEM PROMPT TRANSLATOR ]</span>
+          <h1 class="intro-headline">Transform informal Indonesian into dense English system prompts.</h1>
+        </div>
+        <div class="intro-badges">
+          <span class="pill-badge pastel-green">100% Client-Side</span>
+          <span class="pill-badge pastel-blue">Direct SSE Stream</span>
+          <span class="pill-badge pastel-yellow">Zero Filler</span>
+        </div>
+      </div>
+
+      <!-- Faux-OS Document Window Chrome -->
+      <div class="window-chrome">
+        <!-- Titlebar -->
+        <div class="window-titlebar">
+          <div class="window-controls" aria-hidden="true">
+            <span class="control-dot"></span>
+            <span class="control-dot"></span>
+            <span class="control-dot"></span>
+          </div>
+          <div class="window-title font-mono">
+            <span>raw-input.id</span>
+            <span class="title-sep">&rarr;</span>
+            <span>compressed-prompt.en</span>
+          </div>
+          <div class="window-meta font-mono">
+            <span class="window-chip">Zero-Fluff BPE</span>
+          </div>
+        </div>
+
+        <!-- Studio Grid Split -->
+        <div class="workspace-grid">
+          
+          <!-- Left Panel: Raw Indonesian Input -->
+          <div class="panel panel-input" aria-labelledby="input-heading">
+            <div class="panel-header">
+              <div class="panel-meta">
+                <span class="badge-lang pastel-yellow font-mono">ID</span>
+                <h2 id="input-heading" class="panel-heading">Raw Informal Input</h2>
+              </div>
+              <div class="panel-stats font-mono" id="input-stats">
+                <span id="input-tokens" class="stat-item">0 tok</span>
+                <span class="stat-sep">&middot;</span>
+                <span id="input-chars" class="stat-item">0 chars</span>
+              </div>
+              <div class="panel-header-actions">
+                <button id="btn-clear-input" class="btn-text-action" title="Clear input text (Esc)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                  <span>Clear</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="textarea-wrapper">
+              <textarea
+                id="raw-input"
+                class="code-textarea font-mono"
+                placeholder="Tuliskan instruksi atau prompt dalam bahasa Indonesia informal atau santai...&#10;&#10;Contoh nyata:&#10;'Bro tolong dong bikinin fungsi python buat scrape data harga di tokped tapi yang cepet jangan lambat ya, terus hasilnya simpen ke csv jangan ada error kalo koneksi putus.'"
+                aria-label="Informal Indonesian Input Prompt"
+                spellcheck="false"
+              ></textarea>
+            </div>
+
+            <div class="panel-footer">
+              <div class="keystroke-hints font-mono">
+                <span class="hint-key"><kbd>⌘</kbd>+<kbd>Enter</kbd> Compress</span>
+                <span class="hint-key"><kbd>Esc</kbd> Clear</span>
+              </div>
+              <button id="btn-submit" class="btn-primary-cta" aria-label="Compress and Translate Prompt">
+                <span class="btn-text">Compress &amp; Translate</span>
+                <svg class="btn-icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+                <div class="btn-spinner" aria-hidden="true"></div>
+              </button>
             </div>
           </div>
-          <div class="panel-actions">
-            <button id="btn-clear-input" class="btn-ghost btn-sm" title="Hapus teks (Esc)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-              </svg>
-              <span>Clear</span>
-            </button>
-          </div>
-        </div>
 
-        <div class="textarea-container">
-          <textarea
-            id="raw-input"
-            class="code-textarea"
-            placeholder="Tuliskan instruksi atau prompt dalam bahasa Indonesia informal atau santai...&#10;&#10;Contoh:&#10;'Bro tolong dong bikinin fungsi python buat scrape data harga di tokped tapi yang cepet jangan lambat ya, terus hasilnya simpen ke csv jangan ada error kalo koneksi putus.'"
-            aria-label="Input Prompt Bahasa Indonesia"
-            spellcheck="false"
-          ></textarea>
-        </div>
+          <!-- Right Panel: Compressed English System Prompt -->
+          <div class="panel panel-output" aria-labelledby="output-heading">
+            <div class="panel-header">
+              <div class="panel-meta">
+                <span class="badge-lang pastel-green font-mono">EN</span>
+                <h2 id="output-heading" class="panel-heading">Compressed System Prompt</h2>
+              </div>
+              <div class="panel-stats font-mono" id="output-stats">
+                <span id="output-tokens" class="stat-item">0 tok</span>
+                <span class="stat-sep">&middot;</span>
+                <span id="compression-badge" class="badge-saving">0% Saved</span>
+              </div>
+              <div class="panel-header-actions">
+                <button id="btn-copy" class="btn-action-outline" title="Copy output prompt (⌘⇧C)" aria-label="Copy Output Prompt">
+                  <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                  </svg>
+                  <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  <span class="copy-text">Copy</span>
+                </button>
+                <button id="btn-download" class="btn-action-outline" title="Export as Markdown file" aria-label="Export Prompt as Markdown">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span>Export</span>
+                </button>
+              </div>
+            </div>
 
-        <div class="panel-footer">
-          <div class="shortcut-hints">
-            <span class="hint-item"><kbd>⌘</kbd> + <kbd>Enter</kbd> untuk terjemahkan</span>
-            <span class="hint-item"><kbd>Esc</kbd> untuk bersihkan</span>
-          </div>
-          <button id="btn-submit" class="btn-primary" aria-label="Terjemahkan dan Padatkan Prompt">
-            <span class="btn-text">Compress & Translate</span>
-            <svg class="btn-icon-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M5 12h14M12 5l7 7-7 7"></path>
-            </svg>
-            <div class="btn-spinner" aria-hidden="true"></div>
-          </button>
-        </div>
-      </section>
+            <div class="output-wrapper">
+              <div id="empty-state" class="empty-state">
+                <div class="empty-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                  </svg>
+                </div>
+                <h3 class="empty-title">Awaiting Input</h3>
+                <p class="empty-desc">
+                  Enter raw Indonesian text on the left panel, then press <kbd>⌘</kbd> + <kbd>Enter</kbd> to compile into a dense English prompt.
+                </p>
+              </div>
 
-      <!-- Right Panel: Engineered English Prompt Output -->
-      <section class="panel panel-output" aria-labelledby="output-heading">
-        <div class="panel-header">
-          <div class="panel-meta">
-            <h2 id="output-heading" class="panel-title">
-              <span class="badge-lang badge-en">EN</span>
-              System Prompt Terkompresi
-            </h2>
-            <div class="stats-counter" id="output-stats">
-              <span id="output-tokens" class="counter-item">0 tok</span>
-              <span class="counter-sep">&middot;</span>
-              <span id="compression-badge" class="badge-saving">0% Saved</span>
+              <div id="output-content" class="output-content hidden" tabindex="0" role="region" aria-label="Resulting Compressed English Prompt">
+                <pre id="output-pre"><code id="output-text" class="font-mono"></code><span id="streaming-cursor" class="streaming-cursor hidden"></span></pre>
+              </div>
+            </div>
+
+            <div class="panel-footer analytics-bar">
+              <div class="metric-group">
+                <span class="metric-label font-mono">Efficiency</span>
+                <div class="efficiency-track">
+                  <div id="efficiency-bar" class="efficiency-fill" style="width: 0%;"></div>
+                </div>
+              </div>
+              <div class="metric-readout font-mono">
+                <span id="metric-summary">0 tokens trimmed</span>
+                <span class="readout-sep">&middot;</span>
+                <span id="metric-latency">&mdash;</span>
+              </div>
             </div>
           </div>
-          <div class="panel-actions">
-            <button id="btn-copy" class="btn-action" title="Salin Prompt (⌘⇧C)" aria-label="Salin Hasil">
-              <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
-              </svg>
-              <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              <span class="copy-text">Copy</span>
-            </button>
-            <button id="btn-download" class="btn-ghost btn-sm" title="Simpan sebagai file .md">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-              </svg>
-              <span>Export</span>
-            </button>
-          </div>
-        </div>
 
-        <div class="output-container">
-          <div id="empty-state" class="empty-state">
-            <div class="empty-icon-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-                <polyline points="10 9 9 9 8 9"></polyline>
-              </svg>
-            </div>
-            <p class="empty-title">Menunggu Input</p>
-            <p class="empty-desc">Ketik teks bahasa Indonesia informal di panel kiri, lalu tekan <kbd>⌘ + Enter</kbd> untuk menghasilkan system prompt yang optimal.</p>
-          </div>
-
-          <div id="output-content" class="output-content hidden" tabindex="0" role="region" aria-label="Hasil Prompt Bahasa Inggris">
-            <pre id="output-pre"><code id="output-text"></code><span id="streaming-cursor" class="streaming-cursor hidden"></span></pre>
-          </div>
         </div>
+      </div>
 
-        <div class="panel-footer analytics-footer">
-          <div class="metric-block">
-            <span class="metric-label">Efisiensi Token</span>
-            <div class="metric-progress-bar">
-              <div id="efficiency-bar" class="efficiency-bar-fill" style="width: 0%;"></div>
-            </div>
-          </div>
-          <div class="metric-details">
-            <span id="metric-summary">0 tokens terpangkas</span>
-            <span id="metric-latency" class="metric-latency">&mdash;</span>
-          </div>
-        </div>
-      </section>
     </div>
-
-    <!-- Security & Token Architecture Banner -->
-    <section class="security-banner">
-      <div class="security-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-          <path d="M7 11V7a5 5 0 0110 0v4"></path>
-        </svg>
-        <div>
-          <h4>100% Client-Side Private</h4>
-          <p>Kunci API tersimpan di browser Anda (Local/Session Storage). Tidak pernah dikirim ke backend perantara manapun.</p>
-        </div>
-      </div>
-      <div class="security-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"></path>
-        </svg>
-        <div>
-          <h4>Pangkas Biaya LLM</h4>
-          <p>Menghilangkan kata basa-basi, filler, dan redudansi untuk menghemat hingga 40%&ndash;70% token inference.</p>
-        </div>
-      </div>
-      <div class="security-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-        </svg>
-        <div>
-          <h4>Direct Streaming SSE</h4>
-          <p>Menggunakan streaming HTTP direct ke endpoint provider (Groq, OpenRouter, Gemini, Ollama) tanpa latency tambahan.</p>
-        </div>
-      </div>
-    </section>
   </main>
 
-  <!-- Settings Modal -->
+  <!-- Editorial Minimalist Compact Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-brand font-mono">
+        <span class="footer-logo">YAPPER // ENGINE</span>
+        <span class="footer-sep">&middot;</span>
+        <span class="footer-privacy">100% Client-Side Private</span>
+      </div>
+      <div class="footer-shortcuts font-mono">
+        <span class="shortcut-item"><kbd>⌘K</kbd> Settings</span>
+        <span class="shortcut-item"><kbd>⌘H</kbd> History</span>
+        <span class="shortcut-item"><kbd>⌘⏎</kbd> Execute</span>
+      </div>
+      <div class="footer-status font-mono">
+        <span class="status-indicator-dot"></span>
+        <span>v1.2</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Settings Modal (Warm Monochrome & Crisp 1px Borders) -->
   <div id="settings-modal" class="modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal-container">
       <div class="modal-header">
         <div class="modal-title-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"></circle>
             <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"></path>
           </svg>
-          <h3 id="modal-title">Konfigurasi API &amp; Model</h3>
+          <h3 id="modal-title">Provider &amp; Model Configuration</h3>
         </div>
-        <button id="btn-close-settings" class="btn-icon" aria-label="Tutup Pengaturan">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button id="btn-close-settings" class="btn-ghost-icon" aria-label="Close Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
@@ -233,13 +269,13 @@
         <!-- Provider Select -->
         <div class="form-group">
           <label for="provider-select" class="form-label">
-            Provider LLM
-            <span class="label-badge">Groq Direkomendasikan (Cepat &amp; Gratis)</span>
+            LLM Provider
+            <span class="label-badge pastel-green font-mono">Groq Recommended (Fast &amp; Free)</span>
           </label>
-          <select id="provider-select" class="form-select">
-            <option value="groq">Groq Cloud (Ultra Fast Llama 3.3 70B &middot; 300+ tok/s)</option>
-            <option value="openrouter">OpenRouter (Banyak Pilihan Model &middot; Claude, GPT, Llama)</option>
-            <option value="gemini">Google Gemini (Gemini 2.5 Flash / 1.5 Flash)</option>
+          <select id="provider-select" class="form-select font-mono">
+            <option value="groq">Groq Cloud (Llama 3.3 70B &middot; 300+ tok/s)</option>
+            <option value="openrouter">OpenRouter (Claude 3.5, GPT-4o, Llama)</option>
+            <option value="gemini">Google Gemini (Gemini 2.0 Flash / 1.5 Flash)</option>
             <option value="openai">OpenAI (GPT-4o Mini / GPT-4o)</option>
             <option value="custom">Custom / Ollama Local (http://localhost:11434/v1)</option>
           </select>
@@ -249,19 +285,20 @@
         <div class="form-group">
           <div class="label-with-action">
             <label for="api-key-input" class="form-label">API Key</label>
-            <button id="btn-toggle-key-visibility" type="button" class="link-btn">Lihat Key</button>
+            <button id="btn-toggle-key-visibility" type="button" class="link-btn">Show Key</button>
           </div>
-          <div class="input-with-icon">
+          <div class="input-with-action">
             <input type="password" id="api-key-input" class="form-input font-mono" placeholder="gsk_..." autocomplete="off">
-            <button id="btn-paste-key" type="button" class="btn-input-action" title="Paste dari clipboard">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button id="btn-paste-key" type="button" class="btn-input-paste" title="Paste from clipboard">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"></path>
                 <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
               </svg>
+              <span>Paste</span>
             </button>
           </div>
           <span id="provider-key-guide" class="field-hint">
-            Dapatkan API key gratis di <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>.
+            Get your free API key at <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>.
           </span>
         </div>
 
@@ -269,13 +306,13 @@
         <div class="form-group">
           <div class="label-with-action">
             <label for="model-select" class="form-label">
-              Model Tersedia
-              <span id="model-count-badge" class="label-badge hidden">0 Model</span>
+              Active Model
+              <span id="model-count-badge" class="label-badge pastel-blue font-mono hidden">0 Models</span>
             </label>
             <div class="label-actions-inline">
-              <button id="btn-toggle-model-mode" type="button" class="link-btn">Ketik Manual</button>
-              <button id="btn-fetch-models" type="button" class="btn-icon-xs" title="Refresh list model">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <button id="btn-toggle-model-mode" type="button" class="link-btn">Manual Input</button>
+              <button id="btn-fetch-models" type="button" class="btn-ghost-icon-xs" title="Refresh model list">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M23 4v6h-6M1 20v-6h6"></path>
                   <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path>
                 </svg>
@@ -284,12 +321,12 @@
           </div>
           <div class="model-select-wrapper">
             <select id="model-select" class="form-select font-mono">
-              <option value="" disabled selected>Tempel API Key untuk memuat daftar model...</option>
+              <option value="" disabled selected>Paste API Key to fetch model list...</option>
             </select>
             <input type="text" id="model-input" class="form-input font-mono hidden" placeholder="llama-3.3-70b-versatile">
             <div id="model-fetch-spinner" class="model-fetch-spinner hidden" aria-hidden="true"></div>
           </div>
-          <span id="model-status-hint" class="field-hint">Model akan otomatis diambil begitu API Key ditempel.</span>
+          <span id="model-status-hint" class="field-hint">Models are automatically fetched upon pasting your API Key.</span>
         </div>
 
         <!-- Custom Base URL (if custom selected) -->
@@ -300,20 +337,20 @@
 
         <!-- Storage Strategy -->
         <div class="form-group">
-          <label class="form-label">Penyimpanan Kunci</label>
+          <label class="form-label">Credential Storage Policy</label>
           <div class="storage-options">
             <label class="radio-card">
               <input type="radio" name="storage-strategy" value="local" checked>
               <div class="radio-card-body">
-                <span class="radio-card-title">Local Storage (Tetap Tersimpan)</span>
-                <span class="radio-card-desc">Tersimpan di browser laptop ini sampai Anda klik Purge.</span>
+                <span class="radio-card-title">Local Storage (Persistent)</span>
+                <span class="radio-card-desc">Retained in this local browser until purged manually.</span>
               </div>
             </label>
             <label class="radio-card">
               <input type="radio" name="storage-strategy" value="session">
               <div class="radio-card-body">
-                <span class="radio-card-title">Session Only (Sementara)</span>
-                <span class="radio-card-desc">Otomatis terhapus saat tab browser ini ditutup.</span>
+                <span class="radio-card-title">Session Storage (Ephemeral)</span>
+                <span class="radio-card-desc">Automatically cleared when browser tab is closed.</span>
               </div>
             </label>
           </div>
@@ -322,16 +359,16 @@
         <!-- Danger Zone / Purge -->
         <div class="danger-zone">
           <div class="danger-info">
-            <span class="danger-title">Hapus Kunci &amp; Cache</span>
-            <span class="danger-desc">Hapus API key dari storage browser seketika.</span>
+            <span class="danger-title">Purge Stored Credentials</span>
+            <span class="danger-desc">Immediately delete stored API keys and cached configurations.</span>
           </div>
-          <button id="btn-purge-key" type="button" class="btn-danger">Purge Key</button>
+          <button id="btn-purge-key" type="button" class="btn-danger-outline">Purge Key</button>
         </div>
       </div>
 
       <div class="modal-footer">
-        <button id="btn-cancel-settings" type="button" class="btn-ghost">Batal</button>
-        <button id="btn-save-settings" type="button" class="btn-primary">Simpan Konfigurasi</button>
+        <button id="btn-cancel-settings" type="button" class="btn-ghost-secondary">Cancel</button>
+        <button id="btn-save-settings" type="button" class="btn-primary-cta">Save Configuration</button>
       </div>
     </div>
   </div>
@@ -339,19 +376,20 @@
   <!-- History Drawer Backdrop -->
   <div id="drawer-backdrop" class="drawer-backdrop" aria-hidden="true"></div>
 
-  <!-- History Drawer -->
+  <!-- History Drawer (Editorial Right Pane) -->
   <aside id="history-drawer" class="drawer" aria-hidden="true" aria-labelledby="drawer-title">
     <div class="drawer-header">
       <div class="drawer-title-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
         </svg>
-        <h3 id="drawer-title">Riwayat Prompt Lokal</h3>
+        <h3 id="drawer-title">Local Prompt History</h3>
       </div>
       <div class="drawer-actions">
-        <button id="btn-clear-history" class="btn-ghost btn-sm" title="Hapus Semua Riwayat">Clear All</button>
-        <button id="btn-close-history" class="btn-icon" aria-label="Tutup Riwayat">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button id="btn-clear-history" class="btn-text-action" title="Clear all history entries">Clear All</button>
+        <button id="btn-close-history" class="btn-ghost-icon" aria-label="Close History">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
@@ -361,8 +399,8 @@
 
     <div class="drawer-body">
       <div id="history-empty" class="history-empty">
-        <p>Belum ada riwayat prompt tersimpan.</p>
-        <span>Setiap prompt yang berhasil dikompresi akan dicatat di browser Anda.</span>
+        <p class="history-empty-title">No history records found.</p>
+        <span class="history-empty-desc">Successfully compressed prompts will appear here for one-click restoration.</span>
       </div>
       <div id="history-list" class="history-list"></div>
     </div>
