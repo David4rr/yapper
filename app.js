@@ -1,4 +1,58 @@
-class k{constructor(t={}){this._state={provider:"groq",model:"llama-3.3-70b-versatile",apiKey:"",storageStrategy:"local",customBaseUrl:"http://localhost:11434/v1",isTranslating:!1,...t},this._listeners=new Set}get(t){return this._state[t]}getAll(){return{...this._state}}set(t,e){if(this._state[t]!==e)this._state[t]=e,this._notify(t,e)}update(t){let e=!1;for(let[i,n]of Object.entries(t))if(this._state[i]!==n)this._state[i]=n,e=!0;if(e)this._notify("*",this.getAll())}subscribe(t){return this._listeners.add(t),()=>this._listeners.delete(t)}_notify(t,e){this._listeners.forEach((i)=>{try{i(t,e,this.getAll())}catch(n){console.error("AppState listener error:",n)}})}}var B=`You are a high-precision Telegraphic Prompt Optimization Engine.
+// js/models/AppState.js
+class AppState {
+  constructor(initialState = {}) {
+    this._state = {
+      provider: "groq",
+      model: "llama-3.3-70b-versatile",
+      apiKey: "",
+      storageStrategy: "local",
+      customBaseUrl: "http://localhost:11434/v1",
+      isTranslating: false,
+      ...initialState
+    };
+    this._listeners = new Set;
+  }
+  get(key) {
+    return this._state[key];
+  }
+  getAll() {
+    return { ...this._state };
+  }
+  set(key, value) {
+    if (this._state[key] !== value) {
+      this._state[key] = value;
+      this._notify(key, value);
+    }
+  }
+  update(partialState) {
+    let changed = false;
+    for (const [key, value] of Object.entries(partialState)) {
+      if (this._state[key] !== value) {
+        this._state[key] = value;
+        changed = true;
+      }
+    }
+    if (changed) {
+      this._notify("*", this.getAll());
+    }
+  }
+  subscribe(listener) {
+    this._listeners.add(listener);
+    return () => this._listeners.delete(listener);
+  }
+  _notify(key, value) {
+    this._listeners.forEach((listener) => {
+      try {
+        listener(key, value, this.getAll());
+      } catch (err) {
+        console.error("AppState listener error:", err);
+      }
+    });
+  }
+}
+
+// js/config/constants.js
+var BASE_SYSTEM_PROMPT = `You are a high-precision Telegraphic Prompt Optimization Engine.
 Convert raw, informal, or unstructured inputs (Indonesian or casual English) into ultra-dense, token-minimized, production-grade English prompt directives.
 
 Core Directives:
@@ -6,45 +60,1385 @@ Core Directives:
 2. Telegraphic Imperative Style: Use compact, direct action verbs ("Add...", "Replace X with Y...", "Enforce...", "Refactor...", "Support..."). Express complete technical specifications in the fewest possible tokens.
 3. 100% Technical Fidelity: Retain every constraint, negative requirement, framework/library, and edge case. Resolve typos and slang into precise technical concepts.
 4. Concise Structure: Single tasks -> 1–2 crisp imperative sentences. Multi-requirement tasks -> tight bulleted directives.
-5. Strict Output Only: Output ONLY the compiled English prompt. Absolutely NO intro, NO explanations, and NO surrounding quotation marks.`,u={groq:{name:"Groq Cloud",defaultModel:"llama-3.3-70b-versatile",endpoint:"https://api.groq.com/openai/v1/chat/completions",modelsEndpoint:"https://api.groq.com/openai/v1/models",keyGuide:'Dapatkan API key gratis di <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>.',fallbackModels:[{id:"llama-3.3-70b-versatile",name:"Llama 3.3 70B Versatile (Rekomendasi)"},{id:"llama-3.1-8b-instant",name:"Llama 3.1 8B Instant (Ultra Cepat)"},{id:"mixtral-8x7b-32768",name:"Mixtral 8x7B 32k"},{id:"gemma2-9b-it",name:"Gemma 2 9B IT"}]},openrouter:{name:"OpenRouter",defaultModel:"meta-llama/llama-3.3-70b-instruct",endpoint:"https://openrouter.ai/api/v1/chat/completions",modelsEndpoint:"https://openrouter.ai/api/v1/models",keyGuide:'Dapatkan API key di <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a>.',fallbackModels:[{id:"meta-llama/llama-3.3-70b-instruct",name:"Llama 3.3 70B Instruct"},{id:"anthropic/claude-3.5-sonnet",name:"Claude 3.5 Sonnet"},{id:"google/gemini-2.0-flash-001",name:"Gemini 2.0 Flash"},{id:"openai/gpt-4o-mini",name:"GPT-4o Mini"}]},gemini:{name:"Google Gemini",defaultModel:"gemini-1.5-flash",endpoint:"https://generativelanguage.googleapis.com/v1beta/models/{model}:streamGenerateContent?alt=sse&key={key}",modelsEndpoint:"https://generativelanguage.googleapis.com/v1beta/models?key={key}",keyGuide:'Dapatkan API key gratis di <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a>.',fallbackModels:[{id:"gemini-1.5-flash",name:"Gemini 1.5 Flash (Default)"},{id:"gemini-2.0-flash",name:"Gemini 2.0 Flash"},{id:"gemini-1.5-pro",name:"Gemini 1.5 Pro"}]},openai:{name:"OpenAI",defaultModel:"gpt-4o-mini",endpoint:"https://api.openai.com/v1/chat/completions",modelsEndpoint:"https://api.openai.com/v1/models",keyGuide:'Dapatkan API key di <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a>.',fallbackModels:[{id:"gpt-4o-mini",name:"GPT-4o Mini (Hemat & Cepat)"},{id:"gpt-4o",name:"GPT-4o (Akurasi Tinggi)"}]},custom:{name:"Custom / Local (Ollama)",defaultModel:"llama3.2",endpoint:"http://localhost:11434/v1/chat/completions",modelsEndpoint:"http://localhost:11434/v1/models",keyGuide:"Pastikan endpoint lokal Anda (misal Ollama/vLLM) mengizinkan CORS browser origin.",fallbackModels:[{id:"llama3.2",name:"llama3.2"},{id:"qwen2.5-coder",name:"qwen2.5-coder"},{id:"mistral",name:"mistral"}]}},r={CONFIG:"yapper_config",HISTORY:"yapper_history"};class d{static loadConfig(){let t=localStorage.getItem(r.CONFIG),e="local";if(!t){if(t=sessionStorage.getItem(r.CONFIG),t)e="session"}if(t)try{let i=JSON.parse(t);return{provider:i.provider||"groq",model:i.model||"llama-3.3-70b-versatile",apiKey:i.apiKey||"",customBaseUrl:i.customBaseUrl||"http://localhost:11434/v1",storageStrategy:e}}catch(i){console.error("Failed to parse stored configuration:",i)}return null}static saveConfig(t,e="local"){let i=JSON.stringify({provider:t.provider,model:t.model,apiKey:t.apiKey,customBaseUrl:t.customBaseUrl});if(e==="local")localStorage.setItem(r.CONFIG,i),sessionStorage.removeItem(r.CONFIG);else sessionStorage.setItem(r.CONFIG,i),localStorage.removeItem(r.CONFIG)}static purgeConfig(){localStorage.removeItem(r.CONFIG),sessionStorage.removeItem(r.CONFIG)}}class I{constructor(t=30,e="local"){this.maxItems=t,this._strategy=e,this.history=[],this.load()}setStrategy(t){if(t!==this._strategy){let e=JSON.stringify(this.history);this._getStorage(t).setItem(r.HISTORY,e),this._getStorage(this._strategy).removeItem(r.HISTORY),this._strategy=t}}load(){let t=localStorage.getItem(r.HISTORY)||sessionStorage.getItem(r.HISTORY);try{this.history=t?JSON.parse(t):[]}catch(e){console.warn("Failed to parse history from storage:",e),this.history=[]}return this.history}save(){try{this._getStorage(this._strategy).setItem(r.HISTORY,JSON.stringify(this.history))}catch(t){console.warn("Failed to persist history to storage:",t)}}add({rawInput:t,outputText:e,inTokens:i,outTokens:n}){let s={id:"hist_"+Date.now(),timestamp:new Date().toISOString(),rawInput:t.trim(),outputText:e.trim(),inTokens:i,outTokens:n};if(this.history.unshift(s),this.history.length>this.maxItems)this.history.pop();return this.save(),s}getAll(){return[...this.history]}findById(t){return this.history.find((e)=>e.id===t)||null}deleteById(t){return this.history=this.history.filter((e)=>e.id!==t),this.save(),this.history}clear(){this.history=[],localStorage.removeItem(r.HISTORY),sessionStorage.removeItem(r.HISTORY)}_getStorage(t){return t==="session"?sessionStorage:localStorage}}class G{constructor(){this.rawInput=document.getElementById("raw-input"),this.btnSubmit=document.getElementById("btn-submit"),this.btnClearInput=document.getElementById("btn-clear-input"),this.inputTokens=document.getElementById("input-tokens"),this.inputChars=document.getElementById("input-chars"),this.emptyState=document.getElementById("empty-state"),this.outputContent=document.getElementById("output-content"),this.outputText=document.getElementById("output-text"),this.streamingCursor=document.getElementById("streaming-cursor"),this.outputTokens=document.getElementById("output-tokens"),this.compressionBadge=document.getElementById("compression-badge"),this.efficiencyBar=document.getElementById("efficiency-bar"),this.metricSummary=document.getElementById("metric-summary"),this.metricLatency=document.getElementById("metric-latency"),this.btnCopy=document.getElementById("btn-copy"),this.btnDownload=document.getElementById("btn-download")}getRawInput(){return this.rawInput?this.rawInput.value:""}setRawInput(t){if(this.rawInput)this.rawInput.value=t}focusInput(){if(this.rawInput)this.rawInput.focus()}getOutputText(){return this.outputText?this.outputText.textContent.trim():""}renderInputMetrics(t,e){if(this.inputTokens)this.inputTokens.textContent=`${t} tok`;if(this.inputChars)this.inputChars.textContent=`${e} chars`}renderOutputMetrics(t,e,i=null){if(this.outputTokens)this.outputTokens.textContent=`${e} tok`;if(t>0&&e>0){let n=t-e,s=Math.round(n/t*100);if(n>0){if(this.compressionBadge)this.compressionBadge.textContent=`-${s}% Saved`,this.compressionBadge.className="badge-saving";if(this.efficiencyBar)this.efficiencyBar.style.width=`${Math.min(100,Math.max(15,s))}%`;if(this.metricSummary)this.metricSummary.textContent=`${n} tokens trimmed (${s}% savings)`}else{if(this.compressionBadge)this.compressionBadge.textContent=`+${Math.abs(s)}% Density`,this.compressionBadge.className="badge-saving";if(this.efficiencyBar)this.efficiencyBar.style.width="20%";if(this.metricSummary)this.metricSummary.textContent="Specific context expansion"}}else{if(this.compressionBadge)this.compressionBadge.textContent="0% Saved";if(this.efficiencyBar)this.efficiencyBar.style.width="0%";if(this.metricSummary)this.metricSummary.textContent="0 tokens trimmed"}if(i!==null&&this.metricLatency)this.metricLatency.textContent=`${i}ms`}showOutput(t){if(this.emptyState)this.emptyState.classList.add("hidden");if(this.outputContent)this.outputContent.classList.remove("hidden");if(this.outputText)this.outputText.textContent=t}clearOutput(){if(this.outputText)this.outputText.textContent="";if(this.outputContent)this.outputContent.classList.add("hidden");if(this.emptyState)this.emptyState.classList.remove("hidden");if(this.streamingCursor)this.streamingCursor.classList.add("hidden");if(this.metricLatency)this.metricLatency.textContent="—";this.renderOutputMetrics(0,0)}clearAll(){this.setRawInput(""),this.renderInputMetrics(0,0),this.clearOutput(),this.focusInput()}setStreaming(t){if(t){if(this.emptyState)this.emptyState.classList.add("hidden");if(this.outputContent)this.outputContent.classList.remove("hidden");if(this.outputText)this.outputText.textContent="";if(this.streamingCursor)this.streamingCursor.classList.remove("hidden");if(this.btnSubmit)this.btnSubmit.classList.add("loading")}else{if(this.streamingCursor)this.streamingCursor.classList.add("hidden");if(this.btnSubmit)this.btnSubmit.classList.remove("loading")}}setCopied(t){if(!this.btnCopy)return;if(t)this.btnCopy.classList.add("copied");else this.btnCopy.classList.remove("copied")}async copyText(t){try{await navigator.clipboard.writeText(t)}catch(e){let i=document.createElement("textarea");i.value=t,i.style.position="fixed",i.style.opacity="0",document.body.appendChild(i),i.select(),document.execCommand("copy"),document.body.removeChild(i)}}downloadAsMarkdown(t){let e=new Blob([t],{type:"text/markdown;charset=utf-8;"}),i=URL.createObjectURL(e),n=document.createElement("a");n.href=i,n.download=`prompt_${Date.now()}.md`,document.body.appendChild(n),n.click(),document.body.removeChild(n),URL.revokeObjectURL(i)}bindInput(t){if(this.rawInput)this.rawInput.addEventListener("input",()=>t(this.getRawInput()))}bindClear(t){if(this.btnClearInput)this.btnClearInput.addEventListener("click",t)}bindSubmit(t){if(this.btnSubmit)this.btnSubmit.addEventListener("click",t)}bindCopy(t){if(this.btnCopy)this.btnCopy.addEventListener("click",t)}bindDownload(t){if(this.btnDownload)this.btnDownload.addEventListener("click",t)}}class O{constructor(){this.modal=document.getElementById("settings-modal"),this.btnToggle=document.getElementById("btn-settings-toggle"),this.btnClose=document.getElementById("btn-close-settings"),this.btnCancel=document.getElementById("btn-cancel-settings"),this.btnSave=document.getElementById("btn-save-settings"),this.btnPurge=document.getElementById("btn-purge-key"),this.providerSelect=document.getElementById("provider-select"),this.apiKeyInput=document.getElementById("api-key-input"),this.btnToggleKeyVisibility=document.getElementById("btn-toggle-key-visibility"),this.btnPasteKey=document.getElementById("btn-paste-key"),this.providerKeyGuide=document.getElementById("provider-key-guide"),this.modelSelect=document.getElementById("model-select"),this.modelInput=document.getElementById("model-input"),this.btnToggleModelMode=document.getElementById("btn-toggle-model-mode"),this.btnFetchModels=document.getElementById("btn-fetch-models"),this.modelCountBadge=document.getElementById("model-count-badge"),this.modelStatusHint=document.getElementById("model-status-hint"),this.modelFetchSpinner=document.getElementById("model-fetch-spinner"),this.baseUrlGroup=document.getElementById("base-url-group"),this.baseUrlInput=document.getElementById("base-url-input"),this.storageRadios=document.querySelectorAll('input[name="storage-strategy"]'),this.keyBadge=document.getElementById("key-badge"),this.connectionStatus=document.getElementById("connection-status"),this.statusText=document.getElementById("status-text")}open(){if(this.modal)this.modal.classList.add("open"),this.modal.setAttribute("aria-hidden","false")}close(){if(this.modal)this.modal.classList.remove("open"),this.modal.setAttribute("aria-hidden","true")}isOpen(){return this.modal?this.modal.classList.contains("open"):!1}renderConfig(t,e=!1){if(this.providerSelect)this.providerSelect.value=t.provider;if(this.apiKeyInput)this.apiKeyInput.value=t.apiKey;if(this.modelInput)this.modelInput.value=t.model;if(this.baseUrlInput)this.baseUrlInput.value=t.customBaseUrl;if(this.storageRadios)this.storageRadios.forEach((o)=>{o.checked=o.value===t.storageStrategy});if(t.provider==="custom"){if(this.baseUrlGroup)this.baseUrlGroup.classList.remove("hidden")}else if(this.baseUrlGroup)this.baseUrlGroup.classList.add("hidden");let i=u[t.provider]?.keyGuide||"";if(this.providerKeyGuide)this.providerKeyGuide.innerHTML=i;let n=u[t.provider]?.name?.split(" ")[0]||"API",s=Boolean(t.apiKey||t.provider==="custom");if(this.keyBadge)if(s)this.keyBadge.textContent="Active",this.keyBadge.className="key-status-badge configured";else this.keyBadge.textContent="Setup",this.keyBadge.className="key-status-badge not-configured";if(this.connectionStatus&&this.statusText)if(e)this.connectionStatus.className="status-badge translating",this.statusText.textContent=`${n} · Compressing...`;else if(s)this.connectionStatus.className="status-badge ready",this.statusText.textContent=`${n} · Ready`;else this.connectionStatus.className="status-badge",this.statusText.textContent=`${n} · No Key`}renderModels(t,e,i="",n=""){if(!this.modelSelect)return;this.modelSelect.innerHTML="";let s=!1;if(t.forEach((o)=>{let a=document.createElement("option");if(a.value=o.id,a.textContent=o.name||o.id,o.id===e)a.selected=!0,s=!0;this.modelSelect.appendChild(a)}),!s&&t.length>0){if(this.modelSelect.selectedIndex=0,this.modelInput)this.modelInput.value=this.modelSelect.value}else if(this.modelInput)this.modelInput.value=e;if(this.modelCountBadge)if(i)this.modelCountBadge.textContent=i,this.modelCountBadge.classList.remove("hidden");else this.modelCountBadge.classList.add("hidden");if(this.modelStatusHint&&n)this.modelStatusHint.textContent=n}setFetchingModels(t){if(this.modelFetchSpinner)if(t)this.modelFetchSpinner.classList.remove("hidden");else this.modelFetchSpinner.classList.add("hidden");if(this.btnFetchModels)if(t)this.btnFetchModels.classList.add("spinning");else this.btnFetchModels.classList.remove("spinning")}toggleKeyVisibility(){if(!this.apiKeyInput||!this.btnToggleKeyVisibility)return;if(this.apiKeyInput.type==="password")this.apiKeyInput.type="text",this.btnToggleKeyVisibility.textContent="Hide Key";else this.apiKeyInput.type="password",this.btnToggleKeyVisibility.textContent="Show Key"}toggleModelMode(){if(!this.modelInput||!this.modelSelect||!this.btnToggleModelMode)return;if(!this.modelInput.classList.contains("hidden")){if(this.modelInput.classList.add("hidden"),this.modelSelect.classList.remove("hidden"),this.btnToggleModelMode.textContent="Manual Input",this.modelSelect.value)this.modelInput.value=this.modelSelect.value}else this.modelSelect.classList.add("hidden"),this.modelInput.classList.remove("hidden"),this.modelInput.value=this.modelInput.value||this.modelSelect.value,this.btnToggleModelMode.textContent="Select List",this.modelInput.focus()}getFormData(){let t=Array.from(this.storageRadios).find((n)=>n.checked)?.value||"local",i=!this.modelInput.classList.contains("hidden")&&this.modelInput.value.trim()?this.modelInput.value.trim():this.modelSelect.value||this.modelInput.value.trim()||"llama-3.3-70b-versatile";return{provider:this.providerSelect.value,model:i,apiKey:this.apiKeyInput.value.trim(),customBaseUrl:this.baseUrlInput.value.trim(),storageStrategy:t}}getCurrentApiKey(){return this.apiKeyInput?.value.trim()??""}getCurrentBaseUrl(){return this.baseUrlInput?.value.trim()??""}bindToggle(t){if(this.btnToggle)this.btnToggle.addEventListener("click",t)}bindClose(t){if(this.btnClose)this.btnClose.addEventListener("click",t);if(this.btnCancel)this.btnCancel.addEventListener("click",t);if(this.modal)this.modal.addEventListener("click",(e)=>{if(e.target===this.modal)t()})}bindSave(t){if(this.btnSave)this.btnSave.addEventListener("click",()=>t(this.getFormData()))}bindPurge(t){if(this.btnPurge)this.btnPurge.addEventListener("click",t)}bindProviderChange(t){if(this.providerSelect)this.providerSelect.addEventListener("change",(e)=>t(e.target.value))}bindApiKeyInput(t){if(this.apiKeyInput)this.apiKeyInput.addEventListener("input",(e)=>t(e.target.value))}bindApiKeyPaste(t){if(this.apiKeyInput)this.apiKeyInput.addEventListener("paste",()=>{setTimeout(()=>t(this.apiKeyInput.value.trim()),100)});if(this.btnPasteKey)this.btnPasteKey.addEventListener("click",async()=>{try{let e=await navigator.clipboard.readText();if(e)this.apiKeyInput.value=e.trim(),t(e.trim(),!0)}catch(e){}})}bindToggleKeyVisibility(t){if(this.btnToggleKeyVisibility)this.btnToggleKeyVisibility.addEventListener("click",()=>{if(this.toggleKeyVisibility(),t)t()})}bindToggleModelMode(t){if(this.btnToggleModelMode)this.btnToggleModelMode.addEventListener("click",()=>{if(this.toggleModelMode(),t)t()})}bindFetchModels(t){if(this.btnFetchModels)this.btnFetchModels.addEventListener("click",t)}bindModelSelectChange(t){if(this.modelSelect)this.modelSelect.addEventListener("change",(e)=>{if(this.modelInput)this.modelInput.value=e.target.value;t(e.target.value)})}bindModelInputChange(t){if(this.modelInput)this.modelInput.addEventListener("input",(e)=>t(e.target.value.trim()))}}function y(t){return(t||"").replace(/[&<>"']/g,(e)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"})[e])}class E{constructor(){this.drawer=document.getElementById("history-drawer"),this.backdrop=document.getElementById("drawer-backdrop"),this.btnToggle=document.getElementById("btn-history-toggle"),this.btnClose=document.getElementById("btn-close-history"),this.btnClear=document.getElementById("btn-clear-history"),this.emptyState=document.getElementById("history-empty"),this.list=document.getElementById("history-list")}open(){if(this.drawer)this.drawer.classList.add("open"),this.drawer.setAttribute("aria-hidden","false");if(this.backdrop)this.backdrop.classList.add("open")}close(){if(this.drawer)this.drawer.classList.remove("open"),this.drawer.setAttribute("aria-hidden","true");if(this.backdrop)this.backdrop.classList.remove("open")}isOpen(){return this.drawer?this.drawer.classList.contains("open"):!1}render(t=[]){if(!this.emptyState||!this.list)return;if(!t||t.length===0){this.emptyState.classList.remove("hidden"),this.list.innerHTML="";return}this.emptyState.classList.add("hidden"),this.list.innerHTML=t.map((e)=>{let n=new Date(e.timestamp).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}),s=e.inTokens>0?Math.round((e.inTokens-e.outTokens)/e.inTokens*100):0;return`
-        <div class="history-item" data-id="${e.id}" tabindex="0" role="button" aria-label="Restore prompt history">
+5. Strict Output Only: Output ONLY the compiled English prompt. Absolutely NO intro, NO explanations, and NO surrounding quotation marks.`;
+var PROVIDER_DEFAULTS = {
+  groq: {
+    name: "Groq Cloud",
+    defaultModel: "llama-3.3-70b-versatile",
+    endpoint: "https://api.groq.com/openai/v1/chat/completions",
+    modelsEndpoint: "https://api.groq.com/openai/v1/models",
+    keyGuide: 'Dapatkan API key gratis di <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>.',
+    fallbackModels: [
+      { id: "llama-3.3-70b-versatile", name: "Llama 3.3 70B Versatile (Rekomendasi)" },
+      { id: "llama-3.1-8b-instant", name: "Llama 3.1 8B Instant (Ultra Cepat)" },
+      { id: "mixtral-8x7b-32768", name: "Mixtral 8x7B 32k" },
+      { id: "gemma2-9b-it", name: "Gemma 2 9B IT" }
+    ]
+  },
+  openrouter: {
+    name: "OpenRouter",
+    defaultModel: "meta-llama/llama-3.3-70b-instruct",
+    endpoint: "https://openrouter.ai/api/v1/chat/completions",
+    modelsEndpoint: "https://openrouter.ai/api/v1/models",
+    keyGuide: 'Dapatkan API key di <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a>.',
+    fallbackModels: [
+      { id: "meta-llama/llama-3.3-70b-instruct", name: "Llama 3.3 70B Instruct" },
+      { id: "anthropic/claude-3.5-sonnet", name: "Claude 3.5 Sonnet" },
+      { id: "google/gemini-2.0-flash-001", name: "Gemini 2.0 Flash" },
+      { id: "openai/gpt-4o-mini", name: "GPT-4o Mini" }
+    ]
+  },
+  gemini: {
+    name: "Google Gemini",
+    defaultModel: "gemini-1.5-flash",
+    endpoint: "https://generativelanguage.googleapis.com/v1beta/models/{model}:streamGenerateContent?alt=sse&key={key}",
+    modelsEndpoint: "https://generativelanguage.googleapis.com/v1beta/models?key={key}",
+    keyGuide: 'Dapatkan API key gratis di <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a>.',
+    fallbackModels: [
+      { id: "gemini-1.5-flash", name: "Gemini 1.5 Flash (Default)" },
+      { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash" },
+      { id: "gemini-1.5-pro", name: "Gemini 1.5 Pro" }
+    ]
+  },
+  openai: {
+    name: "OpenAI",
+    defaultModel: "gpt-4o-mini",
+    endpoint: "https://api.openai.com/v1/chat/completions",
+    modelsEndpoint: "https://api.openai.com/v1/models",
+    keyGuide: 'Dapatkan API key di <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a>.',
+    fallbackModels: [
+      { id: "gpt-4o-mini", name: "GPT-4o Mini (Hemat & Cepat)" },
+      { id: "gpt-4o", name: "GPT-4o (Akurasi Tinggi)" }
+    ]
+  },
+  custom: {
+    name: "Custom / Local (Ollama)",
+    defaultModel: "llama3.2",
+    endpoint: "http://localhost:11434/v1/chat/completions",
+    modelsEndpoint: "http://localhost:11434/v1/models",
+    keyGuide: "Pastikan endpoint lokal Anda (misal Ollama/vLLM) mengizinkan CORS browser origin.",
+    fallbackModels: [
+      { id: "llama3.2", name: "llama3.2" },
+      { id: "qwen2.5-coder", name: "qwen2.5-coder" },
+      { id: "mistral", name: "mistral" }
+    ]
+  }
+};
+var STORAGE_KEYS = {
+  CONFIG: "yapper_config",
+  HISTORY: "yapper_history"
+};
+
+// js/models/StorageModel.js
+class StorageModel {
+  static loadConfig() {
+    let stored = localStorage.getItem(STORAGE_KEYS.CONFIG);
+    let strategy = "local";
+    if (!stored) {
+      stored = sessionStorage.getItem(STORAGE_KEYS.CONFIG);
+      if (stored)
+        strategy = "session";
+    }
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        return {
+          provider: parsed.provider || "groq",
+          model: parsed.model || "llama-3.3-70b-versatile",
+          apiKey: parsed.apiKey || "",
+          customBaseUrl: parsed.customBaseUrl || "http://localhost:11434/v1",
+          storageStrategy: strategy
+        };
+      } catch (err) {
+        console.error("Failed to parse stored configuration:", err);
+      }
+    }
+    return null;
+  }
+  static saveConfig(configData, strategy = "local") {
+    const serialized = JSON.stringify({
+      provider: configData.provider,
+      model: configData.model,
+      apiKey: configData.apiKey,
+      customBaseUrl: configData.customBaseUrl
+    });
+    if (strategy === "local") {
+      localStorage.setItem(STORAGE_KEYS.CONFIG, serialized);
+      sessionStorage.removeItem(STORAGE_KEYS.CONFIG);
+    } else {
+      sessionStorage.setItem(STORAGE_KEYS.CONFIG, serialized);
+      localStorage.removeItem(STORAGE_KEYS.CONFIG);
+    }
+  }
+  static purgeConfig() {
+    localStorage.removeItem(STORAGE_KEYS.CONFIG);
+    sessionStorage.removeItem(STORAGE_KEYS.CONFIG);
+  }
+}
+
+// js/models/HistoryModel.js
+class HistoryModel {
+  constructor(maxItems = 30, storageStrategy = "local") {
+    this.maxItems = maxItems;
+    this._strategy = storageStrategy;
+    this.history = [];
+    this.load();
+  }
+  setStrategy(strategy) {
+    if (strategy !== this._strategy) {
+      const current = JSON.stringify(this.history);
+      this._getStorage(strategy).setItem(STORAGE_KEYS.HISTORY, current);
+      this._getStorage(this._strategy).removeItem(STORAGE_KEYS.HISTORY);
+      this._strategy = strategy;
+    }
+  }
+  load() {
+    let stored = localStorage.getItem(STORAGE_KEYS.HISTORY) || sessionStorage.getItem(STORAGE_KEYS.HISTORY);
+    try {
+      this.history = stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      console.warn("Failed to parse history from storage:", e);
+      this.history = [];
+    }
+    return this.history;
+  }
+  save() {
+    try {
+      this._getStorage(this._strategy).setItem(STORAGE_KEYS.HISTORY, JSON.stringify(this.history));
+    } catch (e) {
+      console.warn("Failed to persist history to storage:", e);
+    }
+  }
+  add({ rawInput, outputText, inTokens, outTokens }) {
+    const item = {
+      id: "hist_" + Date.now(),
+      timestamp: new Date().toISOString(),
+      rawInput: rawInput.trim(),
+      outputText: outputText.trim(),
+      inTokens,
+      outTokens
+    };
+    this.history.unshift(item);
+    if (this.history.length > this.maxItems) {
+      this.history.pop();
+    }
+    this.save();
+    return item;
+  }
+  getAll() {
+    return [...this.history];
+  }
+  findById(id) {
+    return this.history.find((h) => h.id === id) || null;
+  }
+  deleteById(id) {
+    this.history = this.history.filter((h) => h.id !== id);
+    this.save();
+    return this.history;
+  }
+  clear() {
+    this.history = [];
+    localStorage.removeItem(STORAGE_KEYS.HISTORY);
+    sessionStorage.removeItem(STORAGE_KEYS.HISTORY);
+  }
+  _getStorage(strategy) {
+    return strategy === "session" ? sessionStorage : localStorage;
+  }
+}
+
+// js/views/StudioView.js
+class StudioView {
+  constructor() {
+    this.rawInput = document.getElementById("raw-input");
+    this.btnSubmit = document.getElementById("btn-submit");
+    this.btnClearInput = document.getElementById("btn-clear-input");
+    this.inputTokens = document.getElementById("input-tokens");
+    this.inputChars = document.getElementById("input-chars");
+    this.emptyState = document.getElementById("empty-state");
+    this.outputContent = document.getElementById("output-content");
+    this.outputText = document.getElementById("output-text");
+    this.streamingCursor = document.getElementById("streaming-cursor");
+    this.outputTokens = document.getElementById("output-tokens");
+    this.compressionBadge = document.getElementById("compression-badge");
+    this.efficiencyBar = document.getElementById("efficiency-bar");
+    this.metricSummary = document.getElementById("metric-summary");
+    this.metricLatency = document.getElementById("metric-latency");
+    this.btnCopy = document.getElementById("btn-copy");
+    this.btnDownload = document.getElementById("btn-download");
+  }
+  getRawInput() {
+    return this.rawInput ? this.rawInput.value : "";
+  }
+  setRawInput(value) {
+    if (this.rawInput) {
+      this.rawInput.value = value;
+    }
+  }
+  focusInput() {
+    if (this.rawInput) {
+      this.rawInput.focus();
+    }
+  }
+  getOutputText() {
+    return this.outputText ? this.outputText.textContent.trim() : "";
+  }
+  renderInputMetrics(tokens, chars) {
+    if (this.inputTokens)
+      this.inputTokens.textContent = `${tokens} tok`;
+    if (this.inputChars)
+      this.inputChars.textContent = `${chars} chars`;
+  }
+  renderOutputMetrics(inTokens, outTokens, elapsedMs = null) {
+    if (this.outputTokens)
+      this.outputTokens.textContent = `${outTokens} tok`;
+    if (inTokens > 0 && outTokens > 0) {
+      const savedTokens = inTokens - outTokens;
+      const savedRatio = Math.round(savedTokens / inTokens * 100);
+      if (savedTokens > 0) {
+        if (this.compressionBadge) {
+          this.compressionBadge.textContent = `-${savedRatio}% Saved`;
+          this.compressionBadge.className = "badge-saving";
+        }
+        if (this.efficiencyBar) {
+          this.efficiencyBar.style.width = `${Math.min(100, Math.max(15, savedRatio))}%`;
+        }
+        if (this.metricSummary) {
+          this.metricSummary.textContent = `${savedTokens} tokens trimmed (${savedRatio}% savings)`;
+        }
+      } else {
+        if (this.compressionBadge) {
+          this.compressionBadge.textContent = `+${Math.abs(savedRatio)}% Density`;
+          this.compressionBadge.className = "badge-saving";
+        }
+        if (this.efficiencyBar) {
+          this.efficiencyBar.style.width = `20%`;
+        }
+        if (this.metricSummary) {
+          this.metricSummary.textContent = `Specific context expansion`;
+        }
+      }
+    } else {
+      if (this.compressionBadge)
+        this.compressionBadge.textContent = `0% Saved`;
+      if (this.efficiencyBar)
+        this.efficiencyBar.style.width = `0%`;
+      if (this.metricSummary)
+        this.metricSummary.textContent = `0 tokens trimmed`;
+    }
+    if (elapsedMs !== null && this.metricLatency) {
+      this.metricLatency.textContent = `${elapsedMs}ms`;
+    }
+  }
+  showOutput(text) {
+    if (this.emptyState)
+      this.emptyState.classList.add("hidden");
+    if (this.outputContent)
+      this.outputContent.classList.remove("hidden");
+    if (this.outputText)
+      this.outputText.textContent = text;
+  }
+  clearOutput() {
+    if (this.outputText)
+      this.outputText.textContent = "";
+    if (this.outputContent)
+      this.outputContent.classList.add("hidden");
+    if (this.emptyState)
+      this.emptyState.classList.remove("hidden");
+    if (this.streamingCursor)
+      this.streamingCursor.classList.add("hidden");
+    if (this.metricLatency)
+      this.metricLatency.textContent = "—";
+    this.renderOutputMetrics(0, 0);
+  }
+  clearAll() {
+    this.setRawInput("");
+    this.renderInputMetrics(0, 0);
+    this.clearOutput();
+    this.focusInput();
+  }
+  setStreaming(isStreaming) {
+    if (isStreaming) {
+      if (this.emptyState)
+        this.emptyState.classList.add("hidden");
+      if (this.outputContent)
+        this.outputContent.classList.remove("hidden");
+      if (this.outputText)
+        this.outputText.textContent = "";
+      if (this.streamingCursor)
+        this.streamingCursor.classList.remove("hidden");
+      if (this.btnSubmit)
+        this.btnSubmit.classList.add("loading");
+    } else {
+      if (this.streamingCursor)
+        this.streamingCursor.classList.add("hidden");
+      if (this.btnSubmit)
+        this.btnSubmit.classList.remove("loading");
+    }
+  }
+  setCopied(isCopied) {
+    if (!this.btnCopy)
+      return;
+    if (isCopied) {
+      this.btnCopy.classList.add("copied");
+    } else {
+      this.btnCopy.classList.remove("copied");
+    }
+  }
+  async copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (_) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+  }
+  downloadAsMarkdown(text) {
+    const blob = new Blob([text], { type: "text/markdown;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `prompt_${Date.now()}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+  bindInput(handler) {
+    if (this.rawInput) {
+      this.rawInput.addEventListener("input", () => handler(this.getRawInput()));
+    }
+  }
+  bindClear(handler) {
+    if (this.btnClearInput) {
+      this.btnClearInput.addEventListener("click", handler);
+    }
+  }
+  bindSubmit(handler) {
+    if (this.btnSubmit) {
+      this.btnSubmit.addEventListener("click", handler);
+    }
+  }
+  bindCopy(handler) {
+    if (this.btnCopy) {
+      this.btnCopy.addEventListener("click", handler);
+    }
+  }
+  bindDownload(handler) {
+    if (this.btnDownload) {
+      this.btnDownload.addEventListener("click", handler);
+    }
+  }
+}
+
+// js/views/SettingsView.js
+class SettingsView {
+  constructor() {
+    this.modal = document.getElementById("settings-modal");
+    this.btnToggle = document.getElementById("btn-settings-toggle");
+    this.btnClose = document.getElementById("btn-close-settings");
+    this.btnCancel = document.getElementById("btn-cancel-settings");
+    this.btnSave = document.getElementById("btn-save-settings");
+    this.btnPurge = document.getElementById("btn-purge-key");
+    this.providerSelect = document.getElementById("provider-select");
+    this.apiKeyInput = document.getElementById("api-key-input");
+    this.btnToggleKeyVisibility = document.getElementById("btn-toggle-key-visibility");
+    this.btnPasteKey = document.getElementById("btn-paste-key");
+    this.providerKeyGuide = document.getElementById("provider-key-guide");
+    this.modelSelect = document.getElementById("model-select");
+    this.modelInput = document.getElementById("model-input");
+    this.btnToggleModelMode = document.getElementById("btn-toggle-model-mode");
+    this.btnFetchModels = document.getElementById("btn-fetch-models");
+    this.modelCountBadge = document.getElementById("model-count-badge");
+    this.modelStatusHint = document.getElementById("model-status-hint");
+    this.modelFetchSpinner = document.getElementById("model-fetch-spinner");
+    this.baseUrlGroup = document.getElementById("base-url-group");
+    this.baseUrlInput = document.getElementById("base-url-input");
+    this.storageRadios = document.querySelectorAll('input[name="storage-strategy"]');
+    this.keyBadge = document.getElementById("key-badge");
+    this.connectionStatus = document.getElementById("connection-status");
+    this.statusText = document.getElementById("status-text");
+  }
+  open() {
+    if (this.modal) {
+      this.modal.classList.add("open");
+      this.modal.setAttribute("aria-hidden", "false");
+    }
+  }
+  close() {
+    if (this.modal) {
+      this.modal.classList.remove("open");
+      this.modal.setAttribute("aria-hidden", "true");
+    }
+  }
+  isOpen() {
+    return this.modal ? this.modal.classList.contains("open") : false;
+  }
+  renderConfig(config, isTranslating = false) {
+    if (this.providerSelect)
+      this.providerSelect.value = config.provider;
+    if (this.apiKeyInput)
+      this.apiKeyInput.value = config.apiKey;
+    if (this.modelInput)
+      this.modelInput.value = config.model;
+    if (this.baseUrlInput)
+      this.baseUrlInput.value = config.customBaseUrl;
+    if (this.storageRadios) {
+      this.storageRadios.forEach((radio) => {
+        radio.checked = radio.value === config.storageStrategy;
+      });
+    }
+    if (config.provider === "custom") {
+      if (this.baseUrlGroup)
+        this.baseUrlGroup.classList.remove("hidden");
+    } else {
+      if (this.baseUrlGroup)
+        this.baseUrlGroup.classList.add("hidden");
+    }
+    const guide = PROVIDER_DEFAULTS[config.provider]?.keyGuide || "";
+    if (this.providerKeyGuide)
+      this.providerKeyGuide.innerHTML = guide;
+    const provName = PROVIDER_DEFAULTS[config.provider]?.name?.split(" ")[0] || "API";
+    const isConfigured = Boolean(config.apiKey || config.provider === "custom");
+    if (this.keyBadge) {
+      if (isConfigured) {
+        this.keyBadge.textContent = "Active";
+        this.keyBadge.className = "key-status-badge configured";
+      } else {
+        this.keyBadge.textContent = "Setup";
+        this.keyBadge.className = "key-status-badge not-configured";
+      }
+    }
+    if (this.connectionStatus && this.statusText) {
+      if (isTranslating) {
+        this.connectionStatus.className = "status-badge translating";
+        this.statusText.textContent = `${provName} · Compressing...`;
+      } else if (isConfigured) {
+        this.connectionStatus.className = "status-badge ready";
+        this.statusText.textContent = `${provName} · Ready`;
+      } else {
+        this.connectionStatus.className = "status-badge";
+        this.statusText.textContent = `${provName} · No Key`;
+      }
+    }
+  }
+  renderModels(models, selectedModel, countText = "", hintText = "") {
+    if (!this.modelSelect)
+      return;
+    this.modelSelect.innerHTML = "";
+    let found = false;
+    models.forEach((m) => {
+      const opt = document.createElement("option");
+      opt.value = m.id;
+      opt.textContent = m.name || m.id;
+      if (m.id === selectedModel) {
+        opt.selected = true;
+        found = true;
+      }
+      this.modelSelect.appendChild(opt);
+    });
+    if (!found && models.length > 0) {
+      this.modelSelect.selectedIndex = 0;
+      if (this.modelInput)
+        this.modelInput.value = this.modelSelect.value;
+    } else {
+      if (this.modelInput)
+        this.modelInput.value = selectedModel;
+    }
+    if (this.modelCountBadge) {
+      if (countText) {
+        this.modelCountBadge.textContent = countText;
+        this.modelCountBadge.classList.remove("hidden");
+      } else {
+        this.modelCountBadge.classList.add("hidden");
+      }
+    }
+    if (this.modelStatusHint && hintText) {
+      this.modelStatusHint.textContent = hintText;
+    }
+  }
+  setFetchingModels(isFetching) {
+    if (this.modelFetchSpinner) {
+      if (isFetching)
+        this.modelFetchSpinner.classList.remove("hidden");
+      else
+        this.modelFetchSpinner.classList.add("hidden");
+    }
+    if (this.btnFetchModels) {
+      if (isFetching)
+        this.btnFetchModels.classList.add("spinning");
+      else
+        this.btnFetchModels.classList.remove("spinning");
+    }
+  }
+  toggleKeyVisibility() {
+    if (!this.apiKeyInput || !this.btnToggleKeyVisibility)
+      return;
+    if (this.apiKeyInput.type === "password") {
+      this.apiKeyInput.type = "text";
+      this.btnToggleKeyVisibility.textContent = "Hide Key";
+    } else {
+      this.apiKeyInput.type = "password";
+      this.btnToggleKeyVisibility.textContent = "Show Key";
+    }
+  }
+  toggleModelMode() {
+    if (!this.modelInput || !this.modelSelect || !this.btnToggleModelMode)
+      return;
+    const isManual = !this.modelInput.classList.contains("hidden");
+    if (isManual) {
+      this.modelInput.classList.add("hidden");
+      this.modelSelect.classList.remove("hidden");
+      this.btnToggleModelMode.textContent = "Manual Input";
+      if (this.modelSelect.value) {
+        this.modelInput.value = this.modelSelect.value;
+      }
+    } else {
+      this.modelSelect.classList.add("hidden");
+      this.modelInput.classList.remove("hidden");
+      this.modelInput.value = this.modelInput.value || this.modelSelect.value;
+      this.btnToggleModelMode.textContent = "Select List";
+      this.modelInput.focus();
+    }
+  }
+  getFormData() {
+    const selectedStrategy = Array.from(this.storageRadios).find((r) => r.checked)?.value || "local";
+    const isManual = !this.modelInput.classList.contains("hidden");
+    const activeModel = isManual && this.modelInput.value.trim() ? this.modelInput.value.trim() : this.modelSelect.value || this.modelInput.value.trim() || "llama-3.3-70b-versatile";
+    return {
+      provider: this.providerSelect.value,
+      model: activeModel,
+      apiKey: this.apiKeyInput.value.trim(),
+      customBaseUrl: this.baseUrlInput.value.trim(),
+      storageStrategy: selectedStrategy
+    };
+  }
+  getCurrentApiKey() {
+    return this.apiKeyInput?.value.trim() ?? "";
+  }
+  getCurrentBaseUrl() {
+    return this.baseUrlInput?.value.trim() ?? "";
+  }
+  bindToggle(handler) {
+    if (this.btnToggle)
+      this.btnToggle.addEventListener("click", handler);
+  }
+  bindClose(handler) {
+    if (this.btnClose)
+      this.btnClose.addEventListener("click", handler);
+    if (this.btnCancel)
+      this.btnCancel.addEventListener("click", handler);
+    if (this.modal) {
+      this.modal.addEventListener("click", (e) => {
+        if (e.target === this.modal)
+          handler();
+      });
+    }
+  }
+  bindSave(handler) {
+    if (this.btnSave)
+      this.btnSave.addEventListener("click", () => handler(this.getFormData()));
+  }
+  bindPurge(handler) {
+    if (this.btnPurge)
+      this.btnPurge.addEventListener("click", handler);
+  }
+  bindProviderChange(handler) {
+    if (this.providerSelect) {
+      this.providerSelect.addEventListener("change", (e) => handler(e.target.value));
+    }
+  }
+  bindApiKeyInput(handler) {
+    if (this.apiKeyInput) {
+      this.apiKeyInput.addEventListener("input", (e) => handler(e.target.value));
+    }
+  }
+  bindApiKeyPaste(handler) {
+    if (this.apiKeyInput) {
+      this.apiKeyInput.addEventListener("paste", () => {
+        setTimeout(() => handler(this.apiKeyInput.value.trim()), 100);
+      });
+    }
+    if (this.btnPasteKey) {
+      this.btnPasteKey.addEventListener("click", async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          if (text) {
+            this.apiKeyInput.value = text.trim();
+            handler(text.trim(), true);
+          }
+        } catch (e) {}
+      });
+    }
+  }
+  bindToggleKeyVisibility(handler) {
+    if (this.btnToggleKeyVisibility) {
+      this.btnToggleKeyVisibility.addEventListener("click", () => {
+        this.toggleKeyVisibility();
+        if (handler)
+          handler();
+      });
+    }
+  }
+  bindToggleModelMode(handler) {
+    if (this.btnToggleModelMode) {
+      this.btnToggleModelMode.addEventListener("click", () => {
+        this.toggleModelMode();
+        if (handler)
+          handler();
+      });
+    }
+  }
+  bindFetchModels(handler) {
+    if (this.btnFetchModels) {
+      this.btnFetchModels.addEventListener("click", handler);
+    }
+  }
+  bindModelSelectChange(handler) {
+    if (this.modelSelect) {
+      this.modelSelect.addEventListener("change", (e) => {
+        if (this.modelInput)
+          this.modelInput.value = e.target.value;
+        handler(e.target.value);
+      });
+    }
+  }
+  bindModelInputChange(handler) {
+    if (this.modelInput) {
+      this.modelInput.addEventListener("input", (e) => handler(e.target.value.trim()));
+    }
+  }
+}
+
+// js/utils/domUtils.js
+function escapeHtml(str) {
+  return (str || "").replace(/[&<>"']/g, (m) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[m]);
+}
+
+// js/views/HistoryView.js
+class HistoryView {
+  constructor() {
+    this.drawer = document.getElementById("history-drawer");
+    this.backdrop = document.getElementById("drawer-backdrop");
+    this.btnToggle = document.getElementById("btn-history-toggle");
+    this.btnClose = document.getElementById("btn-close-history");
+    this.btnClear = document.getElementById("btn-clear-history");
+    this.emptyState = document.getElementById("history-empty");
+    this.list = document.getElementById("history-list");
+  }
+  open() {
+    if (this.drawer) {
+      this.drawer.classList.add("open");
+      this.drawer.setAttribute("aria-hidden", "false");
+    }
+    if (this.backdrop) {
+      this.backdrop.classList.add("open");
+    }
+  }
+  close() {
+    if (this.drawer) {
+      this.drawer.classList.remove("open");
+      this.drawer.setAttribute("aria-hidden", "true");
+    }
+    if (this.backdrop) {
+      this.backdrop.classList.remove("open");
+    }
+  }
+  isOpen() {
+    return this.drawer ? this.drawer.classList.contains("open") : false;
+  }
+  render(items = []) {
+    if (!this.emptyState || !this.list)
+      return;
+    if (!items || items.length === 0) {
+      this.emptyState.classList.remove("hidden");
+      this.list.innerHTML = "";
+      return;
+    }
+    this.emptyState.classList.add("hidden");
+    this.list.innerHTML = items.map((item) => {
+      const date = new Date(item.timestamp);
+      const timeStr = date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      const savings = item.inTokens > 0 ? Math.round((item.inTokens - item.outTokens) / item.inTokens * 100) : 0;
+      return `
+        <div class="history-item" data-id="${item.id}" tabindex="0" role="button" aria-label="Restore prompt history">
           <div class="history-item-meta">
             <div class="history-item-meta-info">
-              <span>${n} · COMPRESSED</span>
-              <span class="badge-saving">${s>0?`-${s}%`:"0%"}</span>
+              <span>${timeStr} · COMPRESSED</span>
+              <span class="badge-saving">${savings > 0 ? `-${savings}%` : "0%"}</span>
             </div>
-            <button class="btn-history-item-delete" data-id="${e.id}" type="button" title="Delete this prompt" aria-label="Delete entry">
+            <button class="btn-history-item-delete" data-id="${item.id}" type="button" title="Delete this prompt" aria-label="Delete entry">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="3 6 5 6 21 6"></polyline>
                 <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
               </svg>
             </button>
           </div>
-          <p class="history-item-input">${y(e.rawInput)}</p>
-          <pre class="history-item-output"><code>${y(e.outputText)}</code></pre>
+          <p class="history-item-input">${escapeHtml(item.rawInput)}</p>
+          <pre class="history-item-output"><code>${escapeHtml(item.outputText)}</code></pre>
         </div>
-      `}).join("")}bindToggle(t){if(this.btnToggle)this.btnToggle.addEventListener("click",t)}bindClose(t){if(this.btnClose)this.btnClose.addEventListener("click",t);if(this.backdrop)this.backdrop.addEventListener("click",t)}bindClear(t){if(this.btnClear)this.btnClear.addEventListener("click",t)}bindRestore(t){if(this.list)this.list.addEventListener("click",(e)=>{if(e.target.closest(".btn-history-item-delete"))return;let i=e.target.closest(".history-item");if(i){let n=i.getAttribute("data-id");t(n)}})}bindDeleteItem(t){if(this.list)this.list.addEventListener("click",(e)=>{let i=e.target.closest(".btn-history-item-delete");if(i){e.stopPropagation();let n=i.getAttribute("data-id");t(n)}})}}class A{constructor(t="toast-container"){this.container=document.getElementById(t)}show(t,e="normal",i=3200){if(!this.container)return;let n=document.createElement("div");n.className=`toast ${e}`;let s=`
+      `;
+    }).join("");
+  }
+  bindToggle(handler) {
+    if (this.btnToggle)
+      this.btnToggle.addEventListener("click", handler);
+  }
+  bindClose(handler) {
+    if (this.btnClose)
+      this.btnClose.addEventListener("click", handler);
+    if (this.backdrop)
+      this.backdrop.addEventListener("click", handler);
+  }
+  bindClear(handler) {
+    if (this.btnClear)
+      this.btnClear.addEventListener("click", handler);
+  }
+  bindRestore(handler) {
+    if (this.list) {
+      this.list.addEventListener("click", (e) => {
+        if (e.target.closest(".btn-history-item-delete"))
+          return;
+        const itemEl = e.target.closest(".history-item");
+        if (itemEl) {
+          const id = itemEl.getAttribute("data-id");
+          handler(id);
+        }
+      });
+    }
+  }
+  bindDeleteItem(handler) {
+    if (this.list) {
+      this.list.addEventListener("click", (e) => {
+        const deleteBtn = e.target.closest(".btn-history-item-delete");
+        if (deleteBtn) {
+          e.stopPropagation();
+          const id = deleteBtn.getAttribute("data-id");
+          handler(id);
+        }
+      });
+    }
+  }
+}
+
+// js/views/ToastView.js
+class ToastView {
+  constructor(containerId = "toast-container") {
+    this.container = document.getElementById(containerId);
+  }
+  show(message, type = "normal", duration = 3200) {
+    if (!this.container)
+      return;
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    let iconSvg = `
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"></circle>
         <line x1="12" y1="16" x2="12" y2="12"></line>
         <line x1="12" y1="8" x2="12.01" y2="8"></line>
       </svg>
-    `;if(e==="success")s=`
+    `;
+    if (type === "success") {
+      iconSvg = `
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 11.08V12a10 10 0 11-5.93-9.14"></path>
           <polyline points="22 4 12 14.01 9 11.01"></polyline>
         </svg>
-      `;else if(e==="error")s=`
+      `;
+    } else if (type === "error") {
+      iconSvg = `
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="15" y1="9" x2="9" y2="15"></line>
           <line x1="9" y1="9" x2="15" y2="15"></line>
         </svg>
-      `;n.innerHTML=`${s}<span>${y(t)}</span>`,this.container.appendChild(n),setTimeout(()=>{n.style.opacity="0",n.style.transform="translateY(8px)",setTimeout(()=>n.remove(),250)},i)}}class N{constructor(){this.modal=document.getElementById("confirm-modal"),this.title=document.getElementById("confirm-title"),this.message=document.getElementById("confirm-message"),this.btnAccept=document.getElementById("btn-accept-confirm"),this.btnCancel=document.getElementById("btn-cancel-confirm"),this.btnClose=document.getElementById("btn-close-confirm"),this._onConfirm=null,this._bindInternalEvents()}show({title:t="Confirm Action",message:e="Are you sure you want to proceed?",confirmText:i="Confirm",cancelText:n="Cancel",danger:s=!0,onConfirm:o}){if(this.title)this.title.textContent=t;if(this.message)this.message.textContent=e;if(this.btnCancel)this.btnCancel.textContent=n;if(this.btnAccept)this.btnAccept.textContent=i,this.btnAccept.className=s?"btn-danger-cta":"btn-primary-cta";if(this._onConfirm=o,this.modal){if(this.modal.classList.add("open"),this.modal.setAttribute("aria-hidden","false"),this.btnAccept)this.btnAccept.focus()}}close(){if(this.modal)this.modal.classList.remove("open"),this.modal.setAttribute("aria-hidden","true");this._onConfirm=null}isOpen(){return this.modal?this.modal.classList.contains("open"):!1}_bindInternalEvents(){if(this.btnCancel)this.btnCancel.addEventListener("click",()=>this.close());if(this.btnClose)this.btnClose.addEventListener("click",()=>this.close());if(this.modal)this.modal.addEventListener("click",(t)=>{if(t.target===this.modal)this.close()});if(this.btnAccept)this.btnAccept.addEventListener("click",()=>{let t=this._onConfirm;if(this.close(),t)t()})}}async function q(t,e,i){let n=t.body.getReader(),s=new TextDecoder,o="",a="";while(!0){let{done:h,value:l}=await n.read();if(h)break;o+=s.decode(l,{stream:!0});let c=o.split(`
-`);o=c.pop()||"";for(let m of c){let p=m.trim();if(!p||p==="data: [DONE]")continue;if(p.startsWith("data: "))try{let b=JSON.parse(p.slice(6)),C=e(b);if(C)a+=C,i(C,a)}catch(b){}}}return a}class g{static async fetchModels(t,e,i=""){if(t==="gemini"){let c=u.gemini.modelsEndpoint.replace("{key}",encodeURIComponent(e)),m=await fetch(c);if(!m.ok)throw Error(`HTTP ${m.status}: ${m.statusText}`);let p=await m.json();if(p.models&&Array.isArray(p.models))return p.models.filter((b)=>b.name&&b.supportedGenerationMethods?.includes("generateContent")).map((b)=>({id:b.name.replace("models/",""),name:b.displayName||b.name.replace("models/","")}));return[]}let n=u[t]?.modelsEndpoint;if(t==="custom")n=i.replace(/\/+$/,"")+"/models";let s={};if(e)s.Authorization=`Bearer ${e}`;let o=await fetch(n,{headers:s});if(!o.ok)throw Error(`HTTP ${o.status}: ${o.statusText}`);let a=await o.json(),l=(Array.isArray(a.data)?a.data:Array.isArray(a.models)?a.models:[]).map((c)=>({id:c.id||c.name,name:c.id||c.name}));if(t==="groq")l=l.filter((c)=>!c.id.includes("whisper")&&!c.id.includes("distil")&&!c.id.includes("guard"));else if(t==="openai")l=l.filter((c)=>c.id.startsWith("gpt-"));return l}static async streamCompression({provider:t,model:e,apiKey:i,customBaseUrl:n,rawInput:s,onChunk:o,signal:a}){if(t==="gemini")return g._streamGemini({model:e,apiKey:i,rawInput:s,onChunk:o,signal:a});return g._streamOpenAICompat({provider:t,model:e,apiKey:i,customBaseUrl:n,rawInput:s,onChunk:o,signal:a})}static async _streamGemini({model:t,apiKey:e,rawInput:i,onChunk:n,signal:s}){let o=u.gemini.endpoint.replace("{model}",encodeURIComponent(t)).replace("{key}",encodeURIComponent(e)),a={contents:[{role:"user",parts:[{text:`System Instruction:
-${B}
+      `;
+    }
+    toast.innerHTML = `${iconSvg}<span>${escapeHtml(message)}</span>`;
+    this.container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(8px)";
+      setTimeout(() => toast.remove(), 250);
+    }, duration);
+  }
+}
+
+// js/views/ConfirmDialogView.js
+class ConfirmDialogView {
+  constructor() {
+    this.modal = document.getElementById("confirm-modal");
+    this.title = document.getElementById("confirm-title");
+    this.message = document.getElementById("confirm-message");
+    this.btnAccept = document.getElementById("btn-accept-confirm");
+    this.btnCancel = document.getElementById("btn-cancel-confirm");
+    this.btnClose = document.getElementById("btn-close-confirm");
+    this._onConfirm = null;
+    this._bindInternalEvents();
+  }
+  show({
+    title = "Confirm Action",
+    message = "Are you sure you want to proceed?",
+    confirmText = "Confirm",
+    cancelText = "Cancel",
+    danger = true,
+    onConfirm
+  }) {
+    if (this.title)
+      this.title.textContent = title;
+    if (this.message)
+      this.message.textContent = message;
+    if (this.btnCancel)
+      this.btnCancel.textContent = cancelText;
+    if (this.btnAccept) {
+      this.btnAccept.textContent = confirmText;
+      this.btnAccept.className = danger ? "btn-danger-cta" : "btn-primary-cta";
+    }
+    this._onConfirm = onConfirm;
+    if (this.modal) {
+      this.modal.classList.add("open");
+      this.modal.setAttribute("aria-hidden", "false");
+      if (this.btnAccept)
+        this.btnAccept.focus();
+    }
+  }
+  close() {
+    if (this.modal) {
+      this.modal.classList.remove("open");
+      this.modal.setAttribute("aria-hidden", "true");
+    }
+    this._onConfirm = null;
+  }
+  isOpen() {
+    return this.modal ? this.modal.classList.contains("open") : false;
+  }
+  _bindInternalEvents() {
+    if (this.btnCancel) {
+      this.btnCancel.addEventListener("click", () => this.close());
+    }
+    if (this.btnClose) {
+      this.btnClose.addEventListener("click", () => this.close());
+    }
+    if (this.modal) {
+      this.modal.addEventListener("click", (e) => {
+        if (e.target === this.modal)
+          this.close();
+      });
+    }
+    if (this.btnAccept) {
+      this.btnAccept.addEventListener("click", () => {
+        const callback = this._onConfirm;
+        this.close();
+        if (callback)
+          callback();
+      });
+    }
+  }
+}
+
+// js/utils/sseParser.js
+async function parseSSEStream(response, extractChunk, onChunk) {
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder;
+  let buffer = "";
+  let accumulated = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done)
+      break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split(`
+`);
+    buffer = lines.pop() || "";
+    for (const line of lines) {
+      const clean = line.trim();
+      if (!clean || clean === "data: [DONE]")
+        continue;
+      if (clean.startsWith("data: ")) {
+        try {
+          const parsed = JSON.parse(clean.slice(6));
+          const chunk = extractChunk(parsed);
+          if (chunk) {
+            accumulated += chunk;
+            onChunk(chunk, accumulated);
+          }
+        } catch (_) {}
+      }
+    }
+  }
+  return accumulated;
+}
+
+// js/services/LLMService.js
+class LLMService {
+  static async fetchModels(provider, apiKey, customUrl = "") {
+    if (provider === "gemini") {
+      const url2 = PROVIDER_DEFAULTS.gemini.modelsEndpoint.replace("{key}", encodeURIComponent(apiKey));
+      const res2 = await fetch(url2);
+      if (!res2.ok) {
+        throw new Error(`HTTP ${res2.status}: ${res2.statusText}`);
+      }
+      const data2 = await res2.json();
+      if (data2.models && Array.isArray(data2.models)) {
+        return data2.models.filter((m) => m.name && m.supportedGenerationMethods?.includes("generateContent")).map((m) => ({
+          id: m.name.replace("models/", ""),
+          name: m.displayName || m.name.replace("models/", "")
+        }));
+      }
+      return [];
+    }
+    let url = PROVIDER_DEFAULTS[provider]?.modelsEndpoint;
+    if (provider === "custom") {
+      url = customUrl.replace(/\/+$/, "") + "/models";
+    }
+    const headers = {};
+    if (apiKey)
+      headers["Authorization"] = `Bearer ${apiKey}`;
+    const res = await fetch(url, { headers });
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+    const data = await res.json();
+    const rawList = Array.isArray(data.data) ? data.data : Array.isArray(data.models) ? data.models : [];
+    let models = rawList.map((m) => ({
+      id: m.id || m.name,
+      name: m.id || m.name
+    }));
+    if (provider === "groq") {
+      models = models.filter((m) => !m.id.includes("whisper") && !m.id.includes("distil") && !m.id.includes("guard"));
+    } else if (provider === "openai") {
+      models = models.filter((m) => m.id.startsWith("gpt-"));
+    }
+    return models;
+  }
+  static async streamCompression({ provider, model, apiKey, customBaseUrl, rawInput, onChunk, signal }) {
+    if (provider === "gemini") {
+      return LLMService._streamGemini({ model, apiKey, rawInput, onChunk, signal });
+    }
+    return LLMService._streamOpenAICompat({ provider, model, apiKey, customBaseUrl, rawInput, onChunk, signal });
+  }
+  static async _streamGemini({ model, apiKey, rawInput, onChunk, signal }) {
+    const endpoint = PROVIDER_DEFAULTS.gemini.endpoint.replace("{model}", encodeURIComponent(model)).replace("{key}", encodeURIComponent(apiKey));
+    const payload = {
+      contents: [{
+        role: "user",
+        parts: [{ text: `System Instruction:
+${BASE_SYSTEM_PROMPT}
 
 User Input to Compress and Translate:
-${i}`}]}],generationConfig:{temperature:0.2,maxOutputTokens:1024}},h=await fetch(o,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(a),signal:s});if(!h.ok){let l=await h.json().catch(()=>({}));throw Error(l.error?.message||`HTTP ${h.status}: ${h.statusText}`)}return q(h,(l)=>l.candidates?.[0]?.content?.parts?.[0]?.text??null,n)}static async _streamOpenAICompat({provider:t,model:e,apiKey:i,customBaseUrl:n,rawInput:s,onChunk:o,signal:a}){let h=u[t]?.endpoint;if(t==="custom")h=n.replace(/\/+$/,"")+"/chat/completions";let l={"Content-Type":"application/json"};if(i)l.Authorization=`Bearer ${i}`;if(t==="openrouter")l["HTTP-Referer"]=window.location.origin||"http://localhost",l["X-Title"]="Yapper Token Compressor";let m=await fetch(h,{method:"POST",headers:l,body:JSON.stringify({model:e,messages:[{role:"system",content:B},{role:"user",content:s}],temperature:0.2,stream:!0}),signal:a});if(!m.ok){let p=await m.json().catch(()=>({}));throw Error(p.error?.message||`HTTP ${m.status}: ${m.statusText}`)}return q(m,(p)=>p.choices?.[0]?.delta?.content??null,o)}}function f(t,e="id"){if(!t||!t.trim())return 0;let i=t.trim().split(/\s+/).filter(Boolean),n=t.length;if(e==="id"){let s=i.length*1.35,o=n/3.6;return Math.max(1,Math.round((s+o)/2))}else{let s=i.length*1.22,o=n/4;return Math.max(1,Math.round((s+o)/2))}}class _{constructor({state:t,historyModel:e,studioView:i,settingsView:n,historyView:s,toastView:o,confirmDialogView:a}){this.state=t,this.historyModel=e,this.studioView=i,this.settingsView=n,this.historyView=s,this.toastView=o,this.confirmDialogView=a,this.isFetchingModels=!1,this.fetchDebounceTimer=null,this._abortController=null}init(){this.loadSavedConfig(),this.renderInitialUI(),this.bindEvents()}loadSavedConfig(){let t=d.loadConfig();if(t)this.state.update({provider:t.provider,model:t.model,apiKey:t.apiKey,customBaseUrl:t.customBaseUrl,storageStrategy:t.storageStrategy}),this.historyModel.setStrategy(t.storageStrategy)}renderInitialUI(){this.settingsView.renderConfig(this.state.getAll(),!1),this.historyView.render(this.historyModel.getAll());let t=this.state.get("apiKey"),e=this.state.get("provider"),i=this.state.get("customBaseUrl");if(t||e==="custom")this.fetchModels(e,t,i,!1);else this.populateFallbackModels(e);this.updateInputMetrics(this.studioView.getRawInput())}bindEvents(){this.studioView.bindInput((t)=>this.updateInputMetrics(t)),this.studioView.bindClear(()=>this.studioView.clearAll()),this.studioView.bindSubmit(()=>this.executeTranslation()),this.studioView.bindCopy(()=>this.handleCopy()),this.studioView.bindDownload(()=>this.handleExport()),this.settingsView.bindToggle(()=>this.settingsView.open()),this.settingsView.bindClose(()=>this.settingsView.close()),this.settingsView.bindSave((t)=>this.handleSaveSettings(t)),this.settingsView.bindPurge(()=>this.handlePurgeSettings()),this.settingsView.bindProviderChange((t)=>this.handleProviderChange(t)),this.settingsView.bindApiKeyInput((t)=>this.handleApiKeyChange(t,!1)),this.settingsView.bindApiKeyPaste((t,e)=>this.handleApiKeyChange(t,e)),this.settingsView.bindFetchModels(()=>{this.fetchModels(this.state.get("provider"),this.settingsView.getCurrentApiKey(),this.settingsView.getCurrentBaseUrl(),!0)}),this.settingsView.bindModelSelectChange((t)=>this.state.set("model",t)),this.settingsView.bindModelInputChange((t)=>this.state.set("model",t)),this.historyView.bindToggle(()=>this.historyView.open()),this.historyView.bindClose(()=>this.historyView.close()),this.historyView.bindClear(()=>this.handleClearHistory()),this.historyView.bindRestore((t)=>this.handleRestoreHistory(t)),this.historyView.bindDeleteItem((t)=>this.handleDeleteHistoryItem(t)),document.addEventListener("keydown",(t)=>this.handleKeyboardShortcuts(t))}updateInputMetrics(t){let e=f(t,"id"),i=t?t.length:0;this.studioView.renderInputMetrics(e,i)}updateOutputMetrics(t,e=null){let i=f(this.studioView.getRawInput(),"id"),n=f(t,"en"),s=e?Math.round(performance.now()-e):null;this.studioView.renderOutputMetrics(i,n,s)}async fetchModels(t,e,i="",n=!1){if(!e&&t!=="custom"){this.populateFallbackModels(t);return}if(this.isFetchingModels)return;this.isFetchingModels=!0,this.settingsView.setFetchingModels(!0);let s=u[t]?.name||t;try{let o=await g.fetchModels(t,e,i);if(o.length>0){if(this.settingsView.renderModels(o,this.state.get("model"),`${o.length} Models`,`✓ ${o.length} active models loaded from ${s}.`),n)this.toastView.show(`${o.length} model aktif berhasil dimuat dari ${s}!`,"success")}else throw Error("Tidak ada model yang ditemukan untuk akun ini.")}catch(o){if(console.warn("Failed to fetch dynamic models:",o),this.populateFallbackModels(t),n)this.toastView.show(`Gagal memuat model: ${o.message}`,"error")}finally{this.isFetchingModels=!1,this.settingsView.setFetchingModels(!1)}}populateFallbackModels(t){let e=u[t]?.fallbackModels||[];this.settingsView.renderModels(e,this.state.get("model"),`${e.length} Model (Default)`,"Pilih model rekomendasi atau masukkan API Key untuk melihat seluruh model akun Anda.")}handleProviderChange(t){let e=u[t];if(e)this.state.set("provider",t),this.state.set("model",e.defaultModel);this.settingsView.renderConfig(this.state.getAll()),this.fetchModels(t,this.settingsView.getCurrentApiKey(),this.settingsView.getCurrentBaseUrl(),!1)}handleApiKeyChange(t,e=!1){if(e)this.fetchModels(this.state.get("provider"),t,this.settingsView.getCurrentBaseUrl(),!0);else if(clearTimeout(this.fetchDebounceTimer),t.length>=8)this.fetchDebounceTimer=setTimeout(()=>{this.fetchModels(this.state.get("provider"),t,this.settingsView.getCurrentBaseUrl(),!1)},500)}handleSaveSettings(t){this.state.update({provider:t.provider,model:t.model,apiKey:t.apiKey,customBaseUrl:t.customBaseUrl,storageStrategy:t.storageStrategy}),this.historyModel.setStrategy(t.storageStrategy),d.saveConfig(t,t.storageStrategy),this.settingsView.renderConfig(this.state.getAll()),this.settingsView.close(),this.toastView.show("Konfigurasi API berhasil disimpan!","success")}handlePurgeSettings(){this.confirmDialogView.show({title:"Purge Stored Credentials",message:"Are you sure you want to permanently delete your stored API keys and cached configurations from this browser?",confirmText:"Purge All",danger:!0,onConfirm:()=>{d.purgeConfig(),this.state.update({apiKey:""}),this.populateFallbackModels(this.state.get("provider")),this.settingsView.renderConfig(this.state.getAll()),this.toastView.show("API Key dan kredensial berhasil dibersihkan!","success")}})}handleClearHistory(){this.confirmDialogView.show({title:"Clear All History",message:"Are you sure you want to permanently delete all prompt history records?",confirmText:"Clear History",danger:!0,onConfirm:()=>{this.historyModel.clear(),this.historyView.render([]),this.toastView.show("Riwayat berhasil dibersihkan","success")}})}handleDeleteHistoryItem(t){this.historyModel.deleteById(t),this.historyView.render(this.historyModel.getAll()),this.toastView.show("Prompt dihapus dari riwayat","normal")}handleRestoreHistory(t){let e=this.historyModel.findById(t);if(e)this.studioView.setRawInput(e.rawInput),this.studioView.showOutput(e.outputText),this.updateInputMetrics(e.rawInput),this.updateOutputMetrics(e.outputText),this.historyView.close(),this.toastView.show("Prompt dipulihkan dari riwayat","success")}async handleCopy(){let t=this.studioView.getOutputText();if(!t){this.toastView.show("Tidak ada hasil prompt untuk disalin.","error");return}await this.studioView.copyText(t),this.studioView.setCopied(!0),this.toastView.show("Prompt berhasil disalin ke clipboard!","success"),setTimeout(()=>this.studioView.setCopied(!1),2000)}handleExport(){let t=this.studioView.getOutputText();if(!t){this.toastView.show("Tidak ada prompt untuk diexport.","error");return}this.studioView.downloadAsMarkdown(t),this.toastView.show("File Markdown berhasil didownload","success")}async executeTranslation(){let t=this.studioView.getRawInput().trim();if(!t){this.toastView.show("Ketikkan input bahasa Indonesia terlebih dahulu!","error"),this.studioView.focusInput();return}let e=this.state.get("provider"),i=this.state.get("apiKey"),n=this.state.get("model"),s=this.state.get("customBaseUrl");if(!i&&e!=="custom"){this.toastView.show("Masukkan API Key Anda di Pengaturan untuk memproses prompt!","error"),this.settingsView.open();return}this.state.set("isTranslating",!0),this.settingsView.renderConfig(this.state.getAll(),!0),this.studioView.setStreaming(!0);let o=performance.now();this._abortController=new AbortController;try{let a=await g.streamCompression({provider:e,model:n,apiKey:i,customBaseUrl:s,rawInput:t,onChunk:(c,m)=>{this.studioView.showOutput(m),this.updateOutputMetrics(m,o)},signal:this._abortController.signal}),h=f(t,"id"),l=f(a,"en");this.historyModel.add({rawInput:t,outputText:a,inTokens:h,outTokens:l}),this.historyView.render(this.historyModel.getAll()),this.updateOutputMetrics(a,o),this.toastView.show("Prompt berhasil dikompresi & diterjemahkan!","success")}catch(a){if(a.name==="AbortError")this.toastView.show("Proses dibatalkan.","normal");else console.error("LLM API Error:",a),this.toastView.show(`Gagal: ${a.message}`,"error"),this.studioView.showOutput(`[Error: ${a.message}]
+${rawInput}` }]
+      }],
+      generationConfig: { temperature: 0.2, maxOutputTokens: 1024 }
+    };
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      signal
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${response.status}: ${response.statusText}`);
+    }
+    return parseSSEStream(response, (parsed) => parsed.candidates?.[0]?.content?.parts?.[0]?.text ?? null, onChunk);
+  }
+  static async _streamOpenAICompat({ provider, model, apiKey, customBaseUrl, rawInput, onChunk, signal }) {
+    let endpoint = PROVIDER_DEFAULTS[provider]?.endpoint;
+    if (provider === "custom") {
+      endpoint = customBaseUrl.replace(/\/+$/, "") + "/chat/completions";
+    }
+    const headers = { "Content-Type": "application/json" };
+    if (apiKey)
+      headers["Authorization"] = `Bearer ${apiKey}`;
+    if (provider === "openrouter") {
+      headers["HTTP-Referer"] = window.location.origin || "http://localhost";
+      headers["X-Title"] = "Yapper Token Compressor";
+    }
+    const payload = {
+      model,
+      messages: [
+        { role: "system", content: BASE_SYSTEM_PROMPT },
+        { role: "user", content: rawInput }
+      ],
+      temperature: 0.2,
+      stream: true
+    };
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+      signal
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${response.status}: ${response.statusText}`);
+    }
+    return parseSSEStream(response, (parsed) => parsed.choices?.[0]?.delta?.content ?? null, onChunk);
+  }
+}
 
-Pastikan API Key benar dan memiliki kuota aktif.`)}finally{this._abortController=null,this.state.set("isTranslating",!1),this.studioView.setStreaming(!1),this.settingsView.renderConfig(this.state.getAll(),!1)}}handleKeyboardShortcuts(t){let i=navigator.platform.toUpperCase().indexOf("MAC")>=0?t.metaKey:t.ctrlKey;if(i&&t.key==="Enter")t.preventDefault(),this.executeTranslation();if(i&&t.key.toLowerCase()==="k")if(t.preventDefault(),this.settingsView.isOpen())this.settingsView.close();else this.settingsView.open();if(i&&t.key.toLowerCase()==="h")if(t.preventDefault(),this.historyView.isOpen())this.historyView.close();else this.historyView.open();if(i&&t.shiftKey&&t.key.toLowerCase()==="c"){if(this.studioView.getOutputText())t.preventDefault(),this.handleCopy()}if(t.key==="Escape"){if(this.confirmDialogView.isOpen())this.confirmDialogView.close();else if(this.settingsView.isOpen())this.settingsView.close();else if(this.historyView.isOpen())this.historyView.close()}}}function L(){let t=new k,i=d.loadConfig()?.storageStrategy??"local",n=new I(30,i),s=new G,o=new O,a=new E,h=new A,l=new N;new _({state:t,historyModel:n,studioView:s,settingsView:o,historyView:a,toastView:h,confirmDialogView:l}).init()}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",L);else L();
+// js/utils/tokenEstimator.js
+function estimateTokens(text, lang = "id") {
+  if (!text || !text.trim())
+    return 0;
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  const charCount = text.length;
+  if (lang === "id") {
+    const tokenByWords = words.length * 1.35;
+    const tokenByChars = charCount / 3.6;
+    return Math.max(1, Math.round((tokenByWords + tokenByChars) / 2));
+  } else {
+    const tokenByWords = words.length * 1.22;
+    const tokenByChars = charCount / 4;
+    return Math.max(1, Math.round((tokenByWords + tokenByChars) / 2));
+  }
+}
+
+// js/controllers/AppController.js
+class AppController {
+  constructor({ state, historyModel, studioView, settingsView, historyView, toastView, confirmDialogView }) {
+    this.state = state;
+    this.historyModel = historyModel;
+    this.studioView = studioView;
+    this.settingsView = settingsView;
+    this.historyView = historyView;
+    this.toastView = toastView;
+    this.confirmDialogView = confirmDialogView;
+    this.isFetchingModels = false;
+    this.fetchDebounceTimer = null;
+    this._abortController = null;
+  }
+  init() {
+    this.loadSavedConfig();
+    this.renderInitialUI();
+    this.bindEvents();
+  }
+  loadSavedConfig() {
+    const saved = StorageModel.loadConfig();
+    if (saved) {
+      this.state.update({
+        provider: saved.provider,
+        model: saved.model,
+        apiKey: saved.apiKey,
+        customBaseUrl: saved.customBaseUrl,
+        storageStrategy: saved.storageStrategy
+      });
+      this.historyModel.setStrategy(saved.storageStrategy);
+    }
+  }
+  renderInitialUI() {
+    this.settingsView.renderConfig(this.state.getAll(), false);
+    this.historyView.render(this.historyModel.getAll());
+    const apiKey = this.state.get("apiKey");
+    const provider = this.state.get("provider");
+    const customUrl = this.state.get("customBaseUrl");
+    if (apiKey || provider === "custom") {
+      this.fetchModels(provider, apiKey, customUrl, false);
+    } else {
+      this.populateFallbackModels(provider);
+    }
+    this.updateInputMetrics(this.studioView.getRawInput());
+  }
+  bindEvents() {
+    this.studioView.bindInput((text) => this.updateInputMetrics(text));
+    this.studioView.bindClear(() => this.studioView.clearAll());
+    this.studioView.bindSubmit(() => this.executeTranslation());
+    this.studioView.bindCopy(() => this.handleCopy());
+    this.studioView.bindDownload(() => this.handleExport());
+    this.settingsView.bindToggle(() => this.settingsView.open());
+    this.settingsView.bindClose(() => this.settingsView.close());
+    this.settingsView.bindSave((formData) => this.handleSaveSettings(formData));
+    this.settingsView.bindPurge(() => this.handlePurgeSettings());
+    this.settingsView.bindProviderChange((provider) => this.handleProviderChange(provider));
+    this.settingsView.bindApiKeyInput((key) => this.handleApiKeyChange(key, false));
+    this.settingsView.bindApiKeyPaste((key, isPaste) => this.handleApiKeyChange(key, isPaste));
+    this.settingsView.bindFetchModels(() => {
+      this.fetchModels(this.state.get("provider"), this.settingsView.getCurrentApiKey(), this.settingsView.getCurrentBaseUrl(), true);
+    });
+    this.settingsView.bindModelSelectChange((model) => this.state.set("model", model));
+    this.settingsView.bindModelInputChange((model) => this.state.set("model", model));
+    this.historyView.bindToggle(() => this.historyView.open());
+    this.historyView.bindClose(() => this.historyView.close());
+    this.historyView.bindClear(() => this.handleClearHistory());
+    this.historyView.bindRestore((id) => this.handleRestoreHistory(id));
+    this.historyView.bindDeleteItem((id) => this.handleDeleteHistoryItem(id));
+    document.addEventListener("keydown", (e) => this.handleKeyboardShortcuts(e));
+  }
+  updateInputMetrics(text) {
+    const tokens = estimateTokens(text, "id");
+    const chars = text ? text.length : 0;
+    this.studioView.renderInputMetrics(tokens, chars);
+  }
+  updateOutputMetrics(outputText, startTime = null) {
+    const inTokens = estimateTokens(this.studioView.getRawInput(), "id");
+    const outTokens = estimateTokens(outputText, "en");
+    const elapsed = startTime ? Math.round(performance.now() - startTime) : null;
+    this.studioView.renderOutputMetrics(inTokens, outTokens, elapsed);
+  }
+  async fetchModels(provider, apiKey, customUrl = "", force = false) {
+    if (!apiKey && provider !== "custom") {
+      this.populateFallbackModels(provider);
+      return;
+    }
+    if (this.isFetchingModels)
+      return;
+    this.isFetchingModels = true;
+    this.settingsView.setFetchingModels(true);
+    const providerName = PROVIDER_DEFAULTS[provider]?.name || provider;
+    try {
+      const models = await LLMService.fetchModels(provider, apiKey, customUrl);
+      if (models.length > 0) {
+        this.settingsView.renderModels(models, this.state.get("model"), `${models.length} Models`, `✓ ${models.length} active models loaded from ${providerName}.`);
+        if (force) {
+          this.toastView.show(`${models.length} model aktif berhasil dimuat dari ${providerName}!`, "success");
+        }
+      } else {
+        throw new Error("Tidak ada model yang ditemukan untuk akun ini.");
+      }
+    } catch (err) {
+      console.warn("Failed to fetch dynamic models:", err);
+      this.populateFallbackModels(provider);
+      if (force) {
+        this.toastView.show(`Gagal memuat model: ${err.message}`, "error");
+      }
+    } finally {
+      this.isFetchingModels = false;
+      this.settingsView.setFetchingModels(false);
+    }
+  }
+  populateFallbackModels(provider) {
+    const fallbacks = PROVIDER_DEFAULTS[provider]?.fallbackModels || [];
+    this.settingsView.renderModels(fallbacks, this.state.get("model"), `${fallbacks.length} Model (Default)`, "Pilih model rekomendasi atau masukkan API Key untuk melihat seluruh model akun Anda.");
+  }
+  handleProviderChange(newProvider) {
+    const def = PROVIDER_DEFAULTS[newProvider];
+    if (def) {
+      this.state.set("provider", newProvider);
+      this.state.set("model", def.defaultModel);
+    }
+    this.settingsView.renderConfig(this.state.getAll());
+    this.fetchModels(newProvider, this.settingsView.getCurrentApiKey(), this.settingsView.getCurrentBaseUrl(), false);
+  }
+  handleApiKeyChange(val, isPaste = false) {
+    if (isPaste) {
+      this.fetchModels(this.state.get("provider"), val, this.settingsView.getCurrentBaseUrl(), true);
+    } else {
+      clearTimeout(this.fetchDebounceTimer);
+      if (val.length >= 8) {
+        this.fetchDebounceTimer = setTimeout(() => {
+          this.fetchModels(this.state.get("provider"), val, this.settingsView.getCurrentBaseUrl(), false);
+        }, 500);
+      }
+    }
+  }
+  handleSaveSettings(formData) {
+    this.state.update({
+      provider: formData.provider,
+      model: formData.model,
+      apiKey: formData.apiKey,
+      customBaseUrl: formData.customBaseUrl,
+      storageStrategy: formData.storageStrategy
+    });
+    this.historyModel.setStrategy(formData.storageStrategy);
+    StorageModel.saveConfig(formData, formData.storageStrategy);
+    this.settingsView.renderConfig(this.state.getAll());
+    this.settingsView.close();
+    this.toastView.show("Konfigurasi API berhasil disimpan!", "success");
+  }
+  handlePurgeSettings() {
+    this.confirmDialogView.show({
+      title: "Purge Stored Credentials",
+      message: "Are you sure you want to permanently delete your stored API keys and cached configurations from this browser?",
+      confirmText: "Purge All",
+      danger: true,
+      onConfirm: () => {
+        StorageModel.purgeConfig();
+        this.state.update({ apiKey: "" });
+        this.populateFallbackModels(this.state.get("provider"));
+        this.settingsView.renderConfig(this.state.getAll());
+        this.toastView.show("API Key dan kredensial berhasil dibersihkan!", "success");
+      }
+    });
+  }
+  handleClearHistory() {
+    this.confirmDialogView.show({
+      title: "Clear All History",
+      message: "Are you sure you want to permanently delete all prompt history records?",
+      confirmText: "Clear History",
+      danger: true,
+      onConfirm: () => {
+        this.historyModel.clear();
+        this.historyView.render([]);
+        this.toastView.show("Riwayat berhasil dibersihkan", "success");
+      }
+    });
+  }
+  handleDeleteHistoryItem(id) {
+    this.historyModel.deleteById(id);
+    this.historyView.render(this.historyModel.getAll());
+    this.toastView.show("Prompt dihapus dari riwayat", "normal");
+  }
+  handleRestoreHistory(id) {
+    const item = this.historyModel.findById(id);
+    if (item) {
+      this.studioView.setRawInput(item.rawInput);
+      this.studioView.showOutput(item.outputText);
+      this.updateInputMetrics(item.rawInput);
+      this.updateOutputMetrics(item.outputText);
+      this.historyView.close();
+      this.toastView.show("Prompt dipulihkan dari riwayat", "success");
+    }
+  }
+  async handleCopy() {
+    const text = this.studioView.getOutputText();
+    if (!text) {
+      this.toastView.show("Tidak ada hasil prompt untuk disalin.", "error");
+      return;
+    }
+    await this.studioView.copyText(text);
+    this.studioView.setCopied(true);
+    this.toastView.show("Prompt berhasil disalin ke clipboard!", "success");
+    setTimeout(() => this.studioView.setCopied(false), 2000);
+  }
+  handleExport() {
+    const text = this.studioView.getOutputText();
+    if (!text) {
+      this.toastView.show("Tidak ada prompt untuk diexport.", "error");
+      return;
+    }
+    this.studioView.downloadAsMarkdown(text);
+    this.toastView.show("File Markdown berhasil didownload", "success");
+  }
+  async executeTranslation() {
+    const rawInput = this.studioView.getRawInput().trim();
+    if (!rawInput) {
+      this.toastView.show("Ketikkan input bahasa Indonesia terlebih dahulu!", "error");
+      this.studioView.focusInput();
+      return;
+    }
+    const provider = this.state.get("provider");
+    const apiKey = this.state.get("apiKey");
+    const model = this.state.get("model");
+    const customBaseUrl = this.state.get("customBaseUrl");
+    if (!apiKey && provider !== "custom") {
+      this.toastView.show("Masukkan API Key Anda di Pengaturan untuk memproses prompt!", "error");
+      this.settingsView.open();
+      return;
+    }
+    this.state.set("isTranslating", true);
+    this.settingsView.renderConfig(this.state.getAll(), true);
+    this.studioView.setStreaming(true);
+    const startTime = performance.now();
+    this._abortController = new AbortController;
+    try {
+      const finalResult = await LLMService.streamCompression({
+        provider,
+        model,
+        apiKey,
+        customBaseUrl,
+        rawInput,
+        onChunk: (_chunk, accumulated) => {
+          this.studioView.showOutput(accumulated);
+          this.updateOutputMetrics(accumulated, startTime);
+        },
+        signal: this._abortController.signal
+      });
+      const inTokens = estimateTokens(rawInput, "id");
+      const outTokens = estimateTokens(finalResult, "en");
+      this.historyModel.add({ rawInput, outputText: finalResult, inTokens, outTokens });
+      this.historyView.render(this.historyModel.getAll());
+      this.updateOutputMetrics(finalResult, startTime);
+      this.toastView.show("Prompt berhasil dikompresi & diterjemahkan!", "success");
+    } catch (err) {
+      if (err.name === "AbortError") {
+        this.toastView.show("Proses dibatalkan.", "normal");
+      } else {
+        console.error("LLM API Error:", err);
+        this.toastView.show(`Gagal: ${err.message}`, "error");
+        this.studioView.showOutput(`[Error: ${err.message}]
+
+Pastikan API Key benar dan memiliki kuota aktif.`);
+      }
+    } finally {
+      this._abortController = null;
+      this.state.set("isTranslating", false);
+      this.studioView.setStreaming(false);
+      this.settingsView.renderConfig(this.state.getAll(), false);
+    }
+  }
+  handleKeyboardShortcuts(e) {
+    const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+    const cmdKey = isMac ? e.metaKey : e.ctrlKey;
+    if (cmdKey && e.key === "Enter") {
+      e.preventDefault();
+      this.executeTranslation();
+    }
+    if (cmdKey && e.key.toLowerCase() === "k") {
+      e.preventDefault();
+      if (this.settingsView.isOpen())
+        this.settingsView.close();
+      else
+        this.settingsView.open();
+    }
+    if (cmdKey && e.key.toLowerCase() === "h") {
+      e.preventDefault();
+      if (this.historyView.isOpen())
+        this.historyView.close();
+      else
+        this.historyView.open();
+    }
+    if (cmdKey && e.shiftKey && e.key.toLowerCase() === "c") {
+      if (this.studioView.getOutputText()) {
+        e.preventDefault();
+        this.handleCopy();
+      }
+    }
+    if (e.key === "Escape") {
+      if (this.confirmDialogView.isOpen())
+        this.confirmDialogView.close();
+      else if (this.settingsView.isOpen())
+        this.settingsView.close();
+      else if (this.historyView.isOpen())
+        this.historyView.close();
+    }
+  }
+}
+
+// js/app.js
+function bootstrap() {
+  const state = new AppState;
+  const savedConfig = StorageModel.loadConfig();
+  const initialStrategy = savedConfig?.storageStrategy ?? "local";
+  const historyModel = new HistoryModel(30, initialStrategy);
+  const studioView = new StudioView;
+  const settingsView = new SettingsView;
+  const historyView = new HistoryView;
+  const toastView = new ToastView;
+  const confirmDialogView = new ConfirmDialogView;
+  const app = new AppController({
+    state,
+    historyModel,
+    studioView,
+    settingsView,
+    historyView,
+    toastView,
+    confirmDialogView
+  });
+  app.init();
+}
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", bootstrap);
+} else {
+  bootstrap();
+}
