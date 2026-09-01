@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500;600&amp;family=Instrument+Serif:ital@0;1&amp;display=swap');
+      .headline { font-family: 'Instrument Serif', Georgia, serif; font-size: 52px; fill: #111111; }
+      .subtext { font-family: 'Geist', -apple-system, sans-serif; font-size: 19px; fill: #787774; }
+      .mono { font-family: 'Geist Mono', monospace; }
+      .chip-text { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 600; fill: #346538; }
+      .kicker-text { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 600; fill: #787774; letter-spacing: 0.08em; }
+      .card-title-text { font-family: 'Geist Mono', monospace; font-size: 12px; fill: #787774; }
+      .code-id { font-family: 'Geist Mono', monospace; font-size: 13.5px; fill: #787774; }
+      .code-en { font-family: 'Geist Mono', monospace; font-size: 13.5px; font-weight: 500; fill: #111111; }
+      .tag-id-text { font-family: 'Geist Mono', monospace; font-size: 10px; font-weight: 600; fill: #956400; }
+      .tag-en-text { font-family: 'Geist Mono', monospace; font-size: 10px; font-weight: 600; fill: #1F6C9F; }
+      .footer-text { font-family: 'Geist Mono', monospace; font-size: 11px; fill: #9E9E9C; }
+    </style>
+    
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#EAEAEA" stroke-width="0.8"/>
+    </pattern>
+
+    <radialGradient id="glow" cx="85%" cy="10%" r="55%">
+      <stop offset="0%" stop-color="#F3ECE0" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#F7F6F3" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#F7F6F3"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <!-- Top Bar -->
+  <g transform="translate(64, 52)">
+    <!-- Logo Icon & Wordmark -->
+    <g transform="scale(0.48)">
+      <path fill="#111111" d="m77 8-3.6 16.1"/>
+      <path fill="#111111" d="m99.5 1.4h-36c-1.9 0-3.5 1.6-3.5 3.5v22.3c0 2.1 1.5 3.8 3.6 3.8h4l7.5 8.6h0.5l2.4-8.6h21.5c2.1 0 3.6-1.5 3.6-3.6v-22.5c0-2-1.6-3.5-3.6-3.5zm1.9 25.9c0 1-0.7 1.9-1.9 1.9h-22.6l-2.2 7.8-6.1-7.7h-5c-1.2 0-2.1-0.7-2.1-2v-22.2c0-1 0.8-2 2-2h35.9c1.2 0 2 0.8 2 1.9v22.3z"/>
+      <path fill="#111111" d="m75 24.1h1.3v-1.8h-0.4c-1 0-1.6-0.3-1.6-1.4v-2.2c0-1.4-0.5-2.3-1.7-2.9 1-0.4 1.7-1.2 1.7-2.8v-2c0-1.1 0.6-1.4 1.5-1.4h0.6v-1.7h-1c-1.8 0-3 0.8-3 2.7v2.4c0 1-0.5 1.8-1.8 1.8h-0.8v2h0.7c1.1-0.1 1.8 0.8 1.8 1.8v2.6c0 1.8 1.1 2.9 2.7 2.9z"/>
+      <path fill="#111111" d="m84.3 7.8h-2.1l-4.1 16.4h1.9z"/>
+      <path fill="#111111" d="m88.3 11v2c0 1.5 0.7 2.4 1.7 2.9-1.1 0.5-1.7 1.4-1.7 2.8v2c0 1.2-0.7 1.6-1.5 1.6h-0.6v1.8h1c1.8 0 3.1-0.7 3.1-3.2v-2.3c0-1.1 0.9-1.8 2-1.8h0.6v-1.9h-0.6c-0.9 0-1.9-0.8-1.9-1.9v-2.4c0-1.8-1.1-2.7-2.8-2.8h-1.4v1.8h0.6c0.8 0 1.5 0.2 1.5 1.4z"/>
+      <path fill="#111111" d="m83.2 46.6-6.7-5.2-0.6 1c-0.9-0.1-3-3-4.3-3.2-1.1 0-1.7 1.2-1.5 2.6 0.3 1.2 2.5 2.4 3.3 3.4l6.2 7.8c1.3-0.7 3.3-0.9 6.5-0.9-1-1-2.7-3.2-2.9-5.5z"/>
+      <path fill="#111111" d="m108.6 45.1-0.7-2.6c-0.4-2.2 0-8.9-1.7-8.9-0.6 0.1-3.3 2.1-5 3.4-2.9-1-5.8-1-8.8-0.4-1-0.6-4-3.5-5.2-3.1-0.5 0.5-0.4 4.1 0 6.1-1.8 1.8-2.4 4.2-3.4 5.9-0.2 2.4 0.8 4.4 3.3 6.8h3c2.5 0 6.3 0.7 8.4 3.1 1.4-2.3 2.9-3.1 5.9-3.1h1.1c2.4 0 3.9 5.3 6.4 6.2s3.7-1 2.6-4.6c-0.9-2-4.5-5.7-5.9-7.3v-1.5zm-20.3-0.1c-1.3 0-1.5-3.1 0-3.2 1.5 0.3 1.3 3.1 0 3.2zm8.1 0.6c-1.6 0.1-1.4-3.5 0-3.2 1.5 0.2 1.4 3.2 0 3.2z"/>
+      <path fill="#111111" d="m116.1 52.1 2.8 0.2c2-8.8-2.5-11.5-1.5-17.5 0.6-3.3 3.4-3.3 3.3-5.7 0-1.2-1.5-2.6-3.5-1.4-2.4 1.6-4.5 4.4-4.3 9 0.2 4.7 3.3 8.7 1.7 14l0.9 1.4h0.6z"/>
+      <path fill="#111111" d="m18.6 69.6-7.8-10.3c-1.7-2.3-0.6-5.3 2.6-5.3 1.6 0 2.8 0.4 3.8 2.2l4.9 7.8 4.4-7.6c0.9-1.8 2.2-2.5 3.9-2.4 2.5 0 4.4 2.4 3 4.9l-7.8 10.6v8c0 2.3-1.2 3.8-3.4 3.8-2.5 0.1-3.7-1.3-3.7-3.7l0.1-8z"/>
+      <path fill="#111111" d="m47.2 56.5c-0.6-1.6-1.8-2.5-4.2-2.5-3.1 0-4.2 1-5 3.4l-7.8 20.1c-0.7 2 0.4 3.9 3.6 3.8 2.2 0 3.3-0.8 3.9-2.9l1.1-3.8h7.6l1.2 3.4c0.9 2.4 2.4 3.4 4.8 3.3 2.5 0 3.7-1.8 2.7-3.9l-7.9-20.9zm-7.4 12.6 2.8-7.2 2.7 7.3-5.5-0.1z"/>
+      <path fill="#111111" d="m67.9 54.1h-5.8c-2.7 0-5.6 1-5.6 4.4v18c0 3.4 1.3 4.9 4 4.8 2.4 0 3.4-1.4 3.5-3.3 0.1-1.6-0.4-6.6-0.4-6.6 0.8 0.9 1.2 1.3 3 1.3 6 0 10.1-2.2 10.1-9.2s-4.1-9.4-8.8-9.4zm-1.5 12.5c-2 0-3 0-3-1.5v-3.7c0-1.3 0.6-1.3 1.6-1.3h2.2c1.7 0.1 2.8 1 2.7 3.5 0.1 2.3-1.3 3-3.5 3z"/>
+      <path fill="#111111" d="m89.8 54.1h-6.4c-1.8 0-4.9 1-4.9 4.4v18.5c0 2.9 1.4 4.3 3.6 4.3 2.3 0 3.4-1.2 3.4-3.4 0.1-2.5-0.4-6.5-0.2-6.5 0.8 0.9 1.3 1.3 3.1 1.3 6 0 10.6-2.1 10.6-9.3s-4.5-9.3-9.2-9.3zm-1.5 12.5c-1.9 0-3.2 0-3.2-1.2v-4c0-1.3 0.4-1.3 1.5-1.3h2.8c1.6 0.2 2.7 0.9 2.6 3.4 0 2.4-1 3.1-3.7 3.1z"/>
+      <path fill="#111111" d="m108.9 72.6-1.3 1.9 2-1.1c-1 0-2 0.1-2-0.8v-10c0-1 1-1.2 1.4-1.2h8c2 0 3.9-0.8 3.8-3.5 0.1-2.2-1.4-3.8-3.8-3.6h-0.8c1 4.3-1.8 6.7-4.2 6.1-2.6-0.6-4-4.4-6.4-6.3h-2c-2.6 0-4 1.9-3.8 4 0 2.5 1.3 4.2 4.3 4v0.5c-3.1 2.4-4 4.9-4 9 0 6.9 3.5 9.7 10 9.7h6.8c2.6 0 4.6-0.9 4.5-4.7 0-1.5-1.3-4-4.4-3.9l-7 0.9c-1.1 0-2.4 0.2-2.4-1.1"/>
+      <path fill="#111111" d="m144.1 76.5c-0.5-0.6-1.2-0.7-2.1-1.5-1.4-1.3-2.9-4.1-3.4-4.8l0.3-0.7c1.7-0.5 5.2-2.5 5.2-6.8 0-5.6-2.5-8.6-9.1-8.6h-7.8c-2.2 0-4.6 1.3-4.6 4.1v19.3c0 3 1.9 3.9 3.9 3.8 2.1 0 3.6-0.9 3.6-3.7v-4.2c0-1.4 1.5-2.9 2.3-1.8l3 4.9c2 3.1 3 4.9 6.6 4.6 2.6 0 4-2.7 2.6-4.6h-0.5zm-10.5-10.3-3.5-0.1v-5.1c0-0.9 0-0.9 0.8-0.9h3.2c1.5 0.1 2.9 0.8 3.3 2.9 0 2-1 3.2-3.8 3.2z"/>
+    </g>
+
+    <!-- Top Badge -->
+    <g transform="translate(680, 4)">
+      <rect width="392" height="32" rx="6" fill="#FFFFFF" stroke="#EAEAEA"/>
+      <text x="196" y="20" text-anchor="middle" class="kicker-text">[ 100% CLIENT-SIDE · ZERO-FLUFF BPE ]</text>
+    </g>
+  </g>
+
+  <!-- Hero Typography -->
+  <g transform="translate(64, 168)">
+    <text x="0" y="44" class="headline">Transform informal Indonesian</text>
+    <text x="0" y="98" class="headline">into dense English system prompts.</text>
+    <text x="0" y="142" class="subtext">Dual-Mode Token Optimization &amp; Natural Translation Engine for high-signal LLM workflows.</text>
+  </g>
+
+  <!-- Faux-OS Window Chrome Card -->
+  <g transform="translate(64, 345)">
+    <!-- Card Frame -->
+    <rect width="1072" height="195" rx="8" fill="#FFFFFF" stroke="#EAEAEA" stroke-width="1" filter="drop-shadow(0 4px 16px rgba(0,0,0,0.03))"/>
+    
+    <!-- Titlebar -->
+    <path d="M 0 8 Q 0 0 8 0 L 1064 0 Q 1072 0 1072 8 L 1072 36 L 0 36 Z" fill="#F9F9F8"/>
+    <line x1="0" y1="36" x2="1072" y2="36" stroke="#EAEAEA" stroke-width="1"/>
+
+    <!-- Dots -->
+    <circle cx="20" cy="18" r="4.5" fill="#EAEAEA"/>
+    <circle cx="34" cy="18" r="4.5" fill="#EAEAEA"/>
+    <circle cx="48" cy="18" r="4.5" fill="#EAEAEA"/>
+
+    <!-- Title -->
+    <text x="536" y="22" text-anchor="middle" class="card-title-text">raw-input.id &rarr; compressed-prompt.en</text>
+
+    <!-- Chip -->
+    <g transform="translate(945, 8)">
+      <rect width="112" height="20" rx="4" fill="#EDF3EC" stroke="rgba(52,101,56,0.2)"/>
+      <text x="56" y="14" text-anchor="middle" class="chip-text">Zero-Fluff BPE</text>
+    </g>
+
+    <!-- Content Split -->
+    <line x1="536" y1="36" x2="536" y2="195" stroke="#EAEAEA" stroke-width="1"/>
+
+    <!-- Left Column: Raw Input -->
+    <g transform="translate(24, 60)">
+      <rect width="52" height="18" rx="3" fill="#FBF3DB" stroke="rgba(149,100,0,0.2)"/>
+      <text x="26" y="13" text-anchor="middle" class="tag-id-text">RAW ID</text>
+      <text x="0" y="44" class="code-id">"bro buatin prompt landing page react tailwind</text>
+      <text x="0" y="66" class="code-id">dong, yg minimalist trus animasinya smooth ya"</text>
+    </g>
+
+    <!-- Right Column: Optimized Output -->
+    <g transform="translate(560, 60)">
+      <rect width="84" height="18" rx="3" fill="#E1F3FE" stroke="rgba(31,108,159,0.2)"/>
+      <text x="42" y="13" text-anchor="middle" class="tag-en-text">OPTIMIZED EN</text>
+      <text x="0" y="44" class="code-en">Act as Senior Frontend Architect. Scaffold</text>
+      <text x="0" y="66" class="code-en">minimalist React + Tailwind UI. 60fps spring motion.</text>
+    </g>
+  </g>
+
+  <!-- Footer Info -->
+  <g transform="translate(64, 585)">
+    <text x="0" y="0" class="footer-text">YAPPER // ENGINE &middot; 100% CLIENT-SIDE PRIVATE</text>
+    <text x="1072" y="0" text-anchor="end" class="footer-text">Groq &middot; OpenRouter &middot; Gemini &middot; OpenAI &middot; Ollama</text>
+  </g>
+</svg>
