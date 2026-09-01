@@ -93,4 +93,11 @@ export class HistoryView {
       });
     }
   }
+
+  // Confirm then invoke callback — UI concern stays in View
+  confirmClear(onConfirm) {
+    if (confirm('Hapus seluruh riwayat prompt lokal?')) {
+      onConfirm();
+    }
+  }
 }

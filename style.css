@@ -155,8 +155,8 @@ body {
 }
 
 .brand-mark {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   background: var(--text-primary);
   color: var(--bg-surface);
   border-radius: var(--radius-sm);
@@ -167,9 +167,9 @@ body {
 }
 
 .brand-mark svg {
-  width: 15px;
-  height: 15px;
-  stroke: var(--bg-surface);
+  width: 18px;
+  height: 18px;
+  display: block;
 }
 
 .brand-link:hover .brand-mark {
@@ -407,25 +407,6 @@ body {
   line-height: 1.15;
   letter-spacing: -0.02em;
   color: var(--text-primary);
-}
-
-.intro-badges {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-/* Pill Badges */
-.pill-badge {
-  display: inline-flex;
-  align-items: center;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: var(--radius-pill);
 }
 
 .pastel-green {

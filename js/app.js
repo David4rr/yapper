@@ -4,6 +4,7 @@
  */
 
 import { AppState } from './models/AppState.js';
+import { StorageModel } from './models/StorageModel.js';
 import { HistoryModel } from './models/HistoryModel.js';
 import { StudioView } from './views/StudioView.js';
 import { SettingsView } from './views/SettingsView.js';
@@ -13,7 +14,13 @@ import { AppController } from './controllers/AppController.js';
 
 function bootstrap() {
   const state = new AppState();
-  const historyModel = new HistoryModel();
+
+  // Resolve storage strategy before constructing HistoryModel so history
+  // is loaded from the correct backend on first boot.
+  const savedConfig = StorageModel.loadConfig();
+  const initialStrategy = savedConfig?.storageStrategy ?? 'local';
+
+  const historyModel = new HistoryModel(30, initialStrategy);
 
   const studioView = new StudioView();
   const settingsView = new SettingsView();

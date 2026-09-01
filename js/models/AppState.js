@@ -12,7 +12,6 @@ export class AppState {
       storageStrategy: 'local', // 'local' | 'session'
       customBaseUrl: 'http://localhost:11434/v1',
       isTranslating: false,
-      abortController: null,
       ...initialState
     };
     this._listeners = new Set();

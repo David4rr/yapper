@@ -1,11 +1,11 @@
 /**
  * AppController
- * Orchestrates application workflows, bridges Models and Views, and manages user interaction logic
+ * Lean event orchestrator: bridges Models and Views, owns no DOM, owns no UI strings.
  */
 
 import { PROVIDER_DEFAULTS } from '../config/constants.js';
 import { StorageModel } from '../models/StorageModel.js';
-import { LLMClient } from '../models/LLMClient.js';
+import { LLMService } from '../services/LLMService.js';
 import { estimateTokens } from '../utils/tokenEstimator.js';
 
 export class AppController {
@@ -19,6 +19,7 @@ export class AppController {
 
     this.isFetchingModels = false;
     this.fetchDebounceTimer = null;
+    this._abortController = null; // runtime handle — not part of serializable state
   }
 
   init() {
@@ -37,17 +38,14 @@ export class AppController {
         customBaseUrl: saved.customBaseUrl,
         storageStrategy: saved.storageStrategy
       });
+      this.historyModel.setStrategy(saved.storageStrategy);
     }
   }
 
   renderInitialUI() {
-    // Render initial settings and header badges
-    this.settingsView.renderConfig(this.state.getAll(), this.state.get('isTranslating'));
-
-    // Render history
+    this.settingsView.renderConfig(this.state.getAll(), false);
     this.historyView.render(this.historyModel.getAll());
 
-    // Fetch models or populate fallbacks
     const apiKey = this.state.get('apiKey');
     const provider = this.state.get('provider');
     const customUrl = this.state.get('customBaseUrl');
@@ -58,19 +56,18 @@ export class AppController {
       this.populateFallbackModels(provider);
     }
 
-    // Update input metrics for initial textarea value
     this.updateInputMetrics(this.studioView.getRawInput());
   }
 
   bindEvents() {
-    // Studio View Binds
+    // Studio
     this.studioView.bindInput(text => this.updateInputMetrics(text));
     this.studioView.bindClear(() => this.studioView.clearAll());
     this.studioView.bindSubmit(() => this.executeTranslation());
     this.studioView.bindCopy(() => this.handleCopy());
     this.studioView.bindDownload(() => this.handleExport());
 
-    // Settings View Binds
+    // Settings
     this.settingsView.bindToggle(() => this.settingsView.open());
     this.settingsView.bindClose(() => this.settingsView.close());
     this.settingsView.bindSave(formData => this.handleSaveSettings(formData));
@@ -81,23 +78,27 @@ export class AppController {
     this.settingsView.bindFetchModels(() => {
       this.fetchModels(
         this.state.get('provider'),
-        this.settingsView.apiKeyInput.value.trim(),
-        this.settingsView.baseUrlInput.value.trim(),
+        this.settingsView.getCurrentApiKey(),
+        this.settingsView.getCurrentBaseUrl(),
         true
       );
     });
     this.settingsView.bindModelSelectChange(model => this.state.set('model', model));
     this.settingsView.bindModelInputChange(model => this.state.set('model', model));
 
-    // History View Binds
+    // History
     this.historyView.bindToggle(() => this.historyView.open());
     this.historyView.bindClose(() => this.historyView.close());
     this.historyView.bindClear(() => this.handleClearHistory());
     this.historyView.bindRestore(id => this.handleRestoreHistory(id));
 
-    // Global Shortcuts
+    // Global shortcuts
     document.addEventListener('keydown', e => this.handleKeyboardShortcuts(e));
   }
+
+  // ---------------------------------------------------------------------------
+  // Metrics
+  // ---------------------------------------------------------------------------
 
   updateInputMetrics(text) {
     const tokens = estimateTokens(text, 'id');
@@ -112,6 +113,10 @@ export class AppController {
     this.studioView.renderOutputMetrics(inTokens, outTokens, elapsed);
   }
 
+  // ---------------------------------------------------------------------------
+  // Model catalog
+  // ---------------------------------------------------------------------------
+
   async fetchModels(provider, apiKey, customUrl = '', force = false) {
     if (!apiKey && provider !== 'custom') {
       this.populateFallbackModels(provider);
@@ -125,7 +130,7 @@ export class AppController {
     const providerName = PROVIDER_DEFAULTS[provider]?.name || provider;
 
     try {
-      const models = await LLMClient.fetchModels(provider, apiKey, customUrl);
+      const models = await LLMService.fetchModels(provider, apiKey, customUrl);
       if (models.length > 0) {
         this.settingsView.renderModels(
           models,
@@ -157,9 +162,13 @@ export class AppController {
       fallbacks,
       this.state.get('model'),
       `${fallbacks.length} Model (Default)`,
-      `Pilih model rekomendasi atau masukkan API Key untuk melihat seluruh model akun Anda.`
+      'Pilih model rekomendasi atau masukkan API Key untuk melihat seluruh model akun Anda.'
     );
   }
+
+  // ---------------------------------------------------------------------------
+  // Settings handlers
+  // ---------------------------------------------------------------------------
 
   handleProviderChange(newProvider) {
     const def = PROVIDER_DEFAULTS[newProvider];
@@ -171,8 +180,8 @@ export class AppController {
     this.settingsView.renderConfig(this.state.getAll());
     this.fetchModels(
       newProvider,
-      this.settingsView.apiKeyInput.value.trim(),
-      this.settingsView.baseUrlInput.value.trim(),
+      this.settingsView.getCurrentApiKey(),
+      this.settingsView.getCurrentBaseUrl(),
       false
     );
   }
@@ -182,7 +191,7 @@ export class AppController {
       this.fetchModels(
         this.state.get('provider'),
         val,
-        this.settingsView.baseUrlInput.value.trim(),
+        this.settingsView.getCurrentBaseUrl(),
         true
       );
     } else {
@@ -192,7 +201,7 @@ export class AppController {
           this.fetchModels(
             this.state.get('provider'),
             val,
-            this.settingsView.baseUrlInput.value.trim(),
+            this.settingsView.getCurrentBaseUrl(),
             false
           );
         }, 500);
@@ -209,6 +218,7 @@ export class AppController {
       storageStrategy: formData.storageStrategy
     });
 
+    this.historyModel.setStrategy(formData.storageStrategy);
     StorageModel.saveConfig(formData, formData.storageStrategy);
     this.settingsView.renderConfig(this.state.getAll());
     this.settingsView.close();
@@ -216,23 +226,27 @@ export class AppController {
   }
 
   handlePurgeSettings() {
-    if (confirm('Yakin ingin menghapus API key dan konfigurasi dari browser Anda?')) {
+    // confirm() delegated to View — UI concern
+    this.settingsView.confirmPurge(() => {
       StorageModel.purgeConfig();
-      this.state.update({
-        apiKey: ''
-      });
+      this.state.update({ apiKey: '' });
       this.populateFallbackModels(this.state.get('provider'));
       this.settingsView.renderConfig(this.state.getAll());
       this.toastView.show('API Key dan kredensial berhasil dibersihkan!', 'success');
-    }
+    });
   }
 
+  // ---------------------------------------------------------------------------
+  // History handlers
+  // ---------------------------------------------------------------------------
+
   handleClearHistory() {
-    if (confirm('Hapus seluruh riwayat prompt lokal?')) {
+    // confirm() delegated to View — UI concern
+    this.historyView.confirmClear(() => {
       this.historyModel.clear();
       this.historyView.render([]);
       this.toastView.show('Riwayat berhasil dibersihkan', 'success');
-    }
+    });
   }
 
   handleRestoreHistory(id) {
@@ -247,6 +261,10 @@ export class AppController {
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Output actions — DOM ops delegated to View
+  // ---------------------------------------------------------------------------
+
   async handleCopy() {
     const text = this.studioView.getOutputText();
     if (!text) {
@@ -254,23 +272,10 @@ export class AppController {
       return;
     }
 
-    try {
-      await navigator.clipboard.writeText(text);
-      this.studioView.setCopied(true);
-      this.toastView.show('Prompt berhasil disalin ke clipboard!', 'success');
-      setTimeout(() => this.studioView.setCopied(false), 2000);
-    } catch (e) {
-      // Fallback
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      this.studioView.setCopied(true);
-      this.toastView.show('Prompt disalin!', 'success');
-      setTimeout(() => this.studioView.setCopied(false), 2000);
-    }
+    await this.studioView.copyText(text);
+    this.studioView.setCopied(true);
+    this.toastView.show('Prompt berhasil disalin ke clipboard!', 'success');
+    setTimeout(() => this.studioView.setCopied(false), 2000);
   }
 
   handleExport() {
@@ -280,17 +285,13 @@ export class AppController {
       return;
     }
 
-    const blob = new Blob([text], { type: 'text/markdown;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `prompt_${Date.now()}.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    this.studioView.downloadAsMarkdown(text);
     this.toastView.show('File Markdown berhasil didownload', 'success');
   }
+
+  // ---------------------------------------------------------------------------
+  // Core translation
+  // ---------------------------------------------------------------------------
 
   async executeTranslation() {
     const rawInput = this.studioView.getRawInput().trim();
@@ -311,17 +312,15 @@ export class AppController {
       return;
     }
 
-    // Set UI loading state
     this.state.set('isTranslating', true);
     this.settingsView.renderConfig(this.state.getAll(), true);
     this.studioView.setStreaming(true);
 
     const startTime = performance.now();
-    const abortController = new AbortController();
-    this.state.set('abortController', abortController);
+    this._abortController = new AbortController();
 
     try {
-      const finalResult = await LLMClient.streamCompression({
+      const finalResult = await LLMService.streamCompression({
         provider,
         model,
         apiKey,
@@ -331,10 +330,9 @@ export class AppController {
           this.studioView.showOutput(accumulated);
           this.updateOutputMetrics(accumulated, startTime);
         },
-        signal: abortController.signal
+        signal: this._abortController.signal
       });
 
-      // Save to history & metrics
       const inTokens = estimateTokens(rawInput, 'id');
       const outTokens = estimateTokens(finalResult, 'en');
 
@@ -352,43 +350,38 @@ export class AppController {
         this.studioView.showOutput(`[Error: ${err.message}]\n\nPastikan API Key benar dan memiliki kuota aktif.`);
       }
     } finally {
+      this._abortController = null;
       this.state.set('isTranslating', false);
       this.studioView.setStreaming(false);
       this.settingsView.renderConfig(this.state.getAll(), false);
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Keyboard shortcuts
+  // ---------------------------------------------------------------------------
+
   handleKeyboardShortcuts(e) {
     const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
     const cmdKey = isMac ? e.metaKey : e.ctrlKey;
 
-    // Submit: Cmd/Ctrl + Enter
     if (cmdKey && e.key === 'Enter') {
       e.preventDefault();
       this.executeTranslation();
     }
 
-    // Settings: Cmd/Ctrl + K
     if (cmdKey && e.key.toLowerCase() === 'k') {
       e.preventDefault();
-      if (this.settingsView.isOpen()) {
-        this.settingsView.close();
-      } else {
-        this.settingsView.open();
-      }
+      if (this.settingsView.isOpen()) this.settingsView.close();
+      else this.settingsView.open();
     }
 
-    // History: Cmd/Ctrl + H
     if (cmdKey && e.key.toLowerCase() === 'h') {
       e.preventDefault();
-      if (this.historyView.isOpen()) {
-        this.historyView.close();
-      } else {
-        this.historyView.open();
-      }
+      if (this.historyView.isOpen()) this.historyView.close();
+      else this.historyView.open();
     }
 
-    // Copy: Cmd/Ctrl + Shift + C
     if (cmdKey && e.shiftKey && e.key.toLowerCase() === 'c') {
       if (this.studioView.getOutputText()) {
         e.preventDefault();
@@ -396,13 +389,9 @@ export class AppController {
       }
     }
 
-    // Escape: close modal/drawer
     if (e.key === 'Escape') {
-      if (this.settingsView.isOpen()) {
-        this.settingsView.close();
-      } else if (this.historyView.isOpen()) {
-        this.historyView.close();
-      }
+      if (this.settingsView.isOpen()) this.settingsView.close();
+      else if (this.historyView.isOpen()) this.historyView.close();
     }
   }
 }

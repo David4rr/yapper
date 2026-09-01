@@ -136,6 +136,38 @@ export class StudioView {
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Self-contained DOM actions — controller MUST call these instead of direct DOM
+  // ---------------------------------------------------------------------------
+
+  async copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (_) {
+      // Fallback for non-secure contexts
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+  }
+
+  downloadAsMarkdown(text) {
+    const blob = new Blob([text], { type: 'text/markdown;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `prompt_${Date.now()}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
   // Event bindings
   bindInput(handler) {
     if (this.rawInput) {

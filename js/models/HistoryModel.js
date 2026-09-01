@@ -1,27 +1,38 @@
 /**
  * HistoryModel
- * Manages local prompt history persistence, retrieval, and truncation
+ * Manages local prompt history persistence, retrieval, and truncation.
+ * Respects storageStrategy: 'local' | 'session'
  */
 
 import { STORAGE_KEYS } from '../config/constants.js';
 
 export class HistoryModel {
-  constructor(maxItems = 30) {
+  constructor(maxItems = 30, storageStrategy = 'local') {
     this.maxItems = maxItems;
+    this._strategy = storageStrategy;
     this.history = [];
     this.load();
   }
 
+  /** Update storage backend when user changes strategy in settings */
+  setStrategy(strategy) {
+    if (strategy !== this._strategy) {
+      // Migrate existing history to new backend
+      const current = JSON.stringify(this.history);
+      this._getStorage(strategy).setItem(STORAGE_KEYS.HISTORY, current);
+      this._getStorage(this._strategy).removeItem(STORAGE_KEYS.HISTORY);
+      this._strategy = strategy;
+    }
+  }
+
   load() {
+    // Try local first, fall back to session (handles strategy-agnostic init)
+    let stored = localStorage.getItem(STORAGE_KEYS.HISTORY)
+      || sessionStorage.getItem(STORAGE_KEYS.HISTORY);
     try {
-      const stored = localStorage.getItem(STORAGE_KEYS.HISTORY);
-      if (stored) {
-        this.history = JSON.parse(stored);
-      } else {
-        this.history = [];
-      }
+      this.history = stored ? JSON.parse(stored) : [];
     } catch (e) {
-      console.warn('Failed to parse history from localStorage:', e);
+      console.warn('Failed to parse history from storage:', e);
       this.history = [];
     }
     return this.history;
@@ -29,9 +40,9 @@ export class HistoryModel {
 
   save() {
     try {
-      localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(this.history));
+      this._getStorage(this._strategy).setItem(STORAGE_KEYS.HISTORY, JSON.stringify(this.history));
     } catch (e) {
-      console.warn('Failed to persist history to localStorage:', e);
+      console.warn('Failed to persist history to storage:', e);
     }
   }
 
@@ -65,5 +76,10 @@ export class HistoryModel {
   clear() {
     this.history = [];
     localStorage.removeItem(STORAGE_KEYS.HISTORY);
+    sessionStorage.removeItem(STORAGE_KEYS.HISTORY);
+  }
+
+  _getStorage(strategy) {
+    return strategy === 'session' ? sessionStorage : localStorage;
   }
 }

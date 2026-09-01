@@ -202,6 +202,25 @@ export class SettingsView {
       storageStrategy: selectedStrategy
     };
   }
+  // ---------------------------------------------------------------------------
+  // Convenience getters — controller MUST use these instead of raw DOM refs
+  // ---------------------------------------------------------------------------
+
+  getCurrentApiKey() {
+    return this.apiKeyInput?.value.trim() ?? '';
+  }
+
+  getCurrentBaseUrl() {
+    return this.baseUrlInput?.value.trim() ?? '';
+  }
+
+  // Confirm then invoke callback — UI concern stays in View
+  confirmPurge(onConfirm) {
+    if (confirm('Yakin ingin menghapus API key dan konfigurasi dari browser Anda?')) {
+      onConfirm();
+    }
+  }
+
 
   // Event bindings
   bindToggle(handler) {
