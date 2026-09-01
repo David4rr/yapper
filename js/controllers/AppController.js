@@ -9,13 +9,14 @@ import { LLMService } from '../services/LLMService.js';
 import { estimateTokens } from '../utils/tokenEstimator.js';
 
 export class AppController {
-  constructor({ state, historyModel, studioView, settingsView, historyView, toastView }) {
+  constructor({ state, historyModel, studioView, settingsView, historyView, toastView, confirmDialogView }) {
     this.state = state;
     this.historyModel = historyModel;
     this.studioView = studioView;
     this.settingsView = settingsView;
     this.historyView = historyView;
     this.toastView = toastView;
+    this.confirmDialogView = confirmDialogView;
 
     this.isFetchingModels = false;
     this.fetchDebounceTimer = null;
@@ -91,7 +92,7 @@ export class AppController {
     this.historyView.bindClose(() => this.historyView.close());
     this.historyView.bindClear(() => this.handleClearHistory());
     this.historyView.bindRestore(id => this.handleRestoreHistory(id));
-
+    this.historyView.bindDeleteItem(id => this.handleDeleteHistoryItem(id));
     // Global shortcuts
     document.addEventListener('keydown', e => this.handleKeyboardShortcuts(e));
   }
@@ -224,15 +225,19 @@ export class AppController {
     this.settingsView.close();
     this.toastView.show('Konfigurasi API berhasil disimpan!', 'success');
   }
-
   handlePurgeSettings() {
-    // confirm() delegated to View — UI concern
-    this.settingsView.confirmPurge(() => {
-      StorageModel.purgeConfig();
-      this.state.update({ apiKey: '' });
-      this.populateFallbackModels(this.state.get('provider'));
-      this.settingsView.renderConfig(this.state.getAll());
-      this.toastView.show('API Key dan kredensial berhasil dibersihkan!', 'success');
+    this.confirmDialogView.show({
+      title: 'Purge Stored Credentials',
+      message: 'Are you sure you want to permanently delete your stored API keys and cached configurations from this browser?',
+      confirmText: 'Purge All',
+      danger: true,
+      onConfirm: () => {
+        StorageModel.purgeConfig();
+        this.state.update({ apiKey: '' });
+        this.populateFallbackModels(this.state.get('provider'));
+        this.settingsView.renderConfig(this.state.getAll());
+        this.toastView.show('API Key dan kredensial berhasil dibersihkan!', 'success');
+      }
     });
   }
 
@@ -241,12 +246,23 @@ export class AppController {
   // ---------------------------------------------------------------------------
 
   handleClearHistory() {
-    // confirm() delegated to View — UI concern
-    this.historyView.confirmClear(() => {
-      this.historyModel.clear();
-      this.historyView.render([]);
-      this.toastView.show('Riwayat berhasil dibersihkan', 'success');
+    this.confirmDialogView.show({
+      title: 'Clear All History',
+      message: 'Are you sure you want to permanently delete all prompt history records?',
+      confirmText: 'Clear History',
+      danger: true,
+      onConfirm: () => {
+        this.historyModel.clear();
+        this.historyView.render([]);
+        this.toastView.show('Riwayat berhasil dibersihkan', 'success');
+      }
     });
+  }
+
+  handleDeleteHistoryItem(id) {
+    this.historyModel.deleteById(id);
+    this.historyView.render(this.historyModel.getAll());
+    this.toastView.show('Prompt dihapus dari riwayat', 'normal');
   }
 
   handleRestoreHistory(id) {
@@ -390,7 +406,8 @@ export class AppController {
     }
 
     if (e.key === 'Escape') {
-      if (this.settingsView.isOpen()) this.settingsView.close();
+      if (this.confirmDialogView.isOpen()) this.confirmDialogView.close();
+      else if (this.settingsView.isOpen()) this.settingsView.close();
       else if (this.historyView.isOpen()) this.historyView.close();
     }
   }

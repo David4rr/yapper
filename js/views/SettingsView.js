@@ -214,13 +214,6 @@ export class SettingsView {
     return this.baseUrlInput?.value.trim() ?? '';
   }
 
-  // Confirm then invoke callback — UI concern stays in View
-  confirmPurge(onConfirm) {
-    if (confirm('Yakin ingin menghapus API key dan konfigurasi dari browser Anda?')) {
-      onConfirm();
-    }
-  }
-
 
   // Event bindings
   bindToggle(handler) {

@@ -370,6 +370,35 @@
     </div>
   </div>
 
+  <!-- Custom Confirmation Dialog (Theme-Consistent, Replaces all native browser dialogs) -->
+  <div id="confirm-modal" class="modal-backdrop confirm-modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+    <div class="modal-container modal-container-sm">
+      <div class="modal-header confirm-header">
+        <div class="modal-title-wrap">
+          <svg class="icon-warning-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <h3 id="confirm-title">Confirm Action</h3>
+        </div>
+        <button id="btn-close-confirm" class="btn-ghost-icon" aria-label="Close dialog">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body confirm-body">
+        <p id="confirm-message" class="confirm-message">Are you sure you want to proceed?</p>
+      </div>
+      <div class="modal-footer confirm-footer">
+        <button id="btn-cancel-confirm" type="button" class="btn-ghost-secondary">Cancel</button>
+        <button id="btn-accept-confirm" type="button" class="btn-danger-cta">Confirm</button>
+      </div>
+    </div>
+  </div>
+
   <!-- History Drawer Backdrop -->
   <div id="drawer-backdrop" class="drawer-backdrop" aria-hidden="true"></div>
 

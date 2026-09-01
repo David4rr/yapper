@@ -1337,6 +1337,47 @@ body {
   background: var(--bg-surface-secondary);
 }
 
+/* --- Custom Confirmation Dialog --- */
+.confirm-modal-backdrop {
+  z-index: 150;
+}
+
+.modal-container-sm {
+  max-width: 420px;
+}
+
+.icon-warning-accent {
+  color: #c53030;
+}
+
+.confirm-body {
+  padding: 16px 20px;
+  gap: 8px;
+}
+
+.confirm-message {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-body);
+  margin: 0;
+}
+
+.btn-danger-cta {
+  background: #c53030;
+  color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 7px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-smooth), opacity var(--duration-fast) var(--ease-smooth);
+}
+
+.btn-danger-cta:hover {
+  background: #9b2c2c;
+}
+
 /* --- History Drawer (Right Slideout) --- */
 .drawer-backdrop {
   position: fixed;
@@ -1467,6 +1508,37 @@ body {
   font-size: 10.5px;
   color: var(--text-muted);
   margin-bottom: 6px;
+}
+
+.history-item-meta-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-history-item-delete {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 3px 5px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.5;
+  transition: opacity var(--duration-fast) var(--ease-smooth), color var(--duration-fast) var(--ease-smooth), background var(--duration-fast) var(--ease-smooth);
+}
+
+.btn-history-item-delete:hover {
+  opacity: 1;
+  color: #c53030;
+  background: rgba(197, 48, 48, 0.08);
+}
+
+.btn-history-item-delete svg {
+  width: 13px;
+  height: 13px;
 }
 
 .history-item-input {

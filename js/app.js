@@ -10,6 +10,7 @@ import { StudioView } from './views/StudioView.js';
 import { SettingsView } from './views/SettingsView.js';
 import { HistoryView } from './views/HistoryView.js';
 import { ToastView } from './views/ToastView.js';
+import { ConfirmDialogView } from './views/ConfirmDialogView.js';
 import { AppController } from './controllers/AppController.js';
 
 function bootstrap() {
@@ -26,6 +27,7 @@ function bootstrap() {
   const settingsView = new SettingsView();
   const historyView = new HistoryView();
   const toastView = new ToastView();
+  const confirmDialogView = new ConfirmDialogView();
 
   const app = new AppController({
     state,
@@ -33,7 +35,8 @@ function bootstrap() {
     studioView,
     settingsView,
     historyView,
-    toastView
+    toastView,
+    confirmDialogView
   });
 
   app.init();

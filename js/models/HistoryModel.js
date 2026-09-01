@@ -73,6 +73,12 @@ export class HistoryModel {
     return this.history.find(h => h.id === id) || null;
   }
 
+  deleteById(id) {
+    this.history = this.history.filter(h => h.id !== id);
+    this.save();
+    return this.history;
+  }
+
   clear() {
     this.history = [];
     localStorage.removeItem(STORAGE_KEYS.HISTORY);
