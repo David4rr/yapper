@@ -35,57 +35,18 @@
 .brand-link {
   display: flex;
   align-items: center;
-  gap: 10px;
   text-decoration: none;
-  color: var(--text-primary);
 }
 
-.brand-mark {
-  width: 30px;
-  height: 30px;
-  background: var(--text-primary);
-  color: var(--bg-surface);
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform var(--duration-fast) var(--ease-editorial);
-}
-
-.brand-mark svg {
-  width: 18px;
-  height: 18px;
+.brand-logo {
+  height: 32px;
+  width: auto;
   display: block;
+  transition: opacity var(--duration-fast) var(--ease-smooth);
 }
 
-.brand-link:hover .brand-mark {
-  transform: scale(0.96);
-}
-
-.brand-meta {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.brand-name {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: -0.01em;
-  color: var(--text-primary);
-}
-
-.brand-version {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.05em;
-  color: var(--text-secondary);
-  background: var(--bg-surface-secondary);
-  border: 1px solid var(--border-light);
-  padding: 1px 5px;
-  border-radius: var(--radius-xs);
-  text-transform: uppercase;
+.brand-link:hover .brand-logo {
+  opacity: 0.75;
 }
 
 /* Nav actions */
