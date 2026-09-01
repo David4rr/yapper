@@ -1,0 +1,23 @@
+/* ==========================================================================
+   YAPPER — Main CSS Entry Point
+   Design System: Premium Utilitarian Minimalism & Compact Application Interface
+
+   Import order: tokens → reset → components → utilities
+   Each partial maps to its MVC counterpart in js/views/ or js/config/
+   ========================================================================== */
+
+/* Foundation */
+@import './base/tokens.css';
+@import './base/reset.css';
+
+/* Components (one file per View) */
+@import './components/header.css';       /* SettingsView.js: header status */
+@import './components/studio.css';       /* StudioView.js: workspace, panels, analytics */
+@import './components/footer.css';       /* AppController.js: footer */
+@import './components/settings-modal.css'; /* SettingsView.js: modal, forms */
+@import './components/confirm-dialog.css'; /* ConfirmDialogView.js */
+@import './components/history-drawer.css'; /* HistoryView.js */
+@import './components/toast.css';        /* ToastView.js */
+
+/* Global helpers & responsive overrides */
+@import './utilities.css';

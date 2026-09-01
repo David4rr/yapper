@@ -1,0 +1,68 @@
+/* ==========================================================================
+   Design Tokens — CSS Custom Properties
+   ========================================================================== */
+
+:root {
+  /* Canvas & Warm Surfaces */
+  --bg-canvas: #F7F6F3;
+  --bg-canvas-subtle: #FBFBFA;
+  --bg-surface: #FFFFFF;
+  --bg-surface-secondary: #F9F9F8;
+  --bg-surface-tertiary: #F1F0EC;
+  --bg-input: #FFFFFF;
+  --bg-code: #F9F9F8;
+
+  /* Structural Dividers & Borders (Strict 1px #EAEAEA) */
+  --border-light: #EAEAEA;
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-strong: #D4D4D2;
+  --border-focus: #111111;
+
+  /* Typography Colors (High Contrast Off-Black & Muted Grays) */
+  --text-primary: #111111;
+  --text-body: #2F3437;
+  --text-secondary: #787774;
+  --text-muted: #9E9E9C;
+  --text-inverse: #FFFFFF;
+
+  /* Muted Spot Pastel Accents */
+  --pastel-green-bg: #EDF3EC;
+  --pastel-green-text: #346538;
+  --pastel-green-border: rgba(52, 101, 56, 0.18);
+
+  --pastel-blue-bg: #E1F3FE;
+  --pastel-blue-text: #1F6C9F;
+  --pastel-blue-border: rgba(31, 108, 159, 0.18);
+
+  --pastel-red-bg: #FDEBEC;
+  --pastel-red-text: #9F2F2D;
+  --pastel-red-border: rgba(159, 47, 45, 0.18);
+
+  --pastel-yellow-bg: #FBF3DB;
+  --pastel-yellow-text: #956400;
+  --pastel-yellow-border: rgba(149, 100, 0, 0.18);
+
+  /* Typography Stacks */
+  --font-sans: 'Geist', 'SF Pro Display', 'Helvetica Neue', 'Switzer', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'Instrument Serif', 'Newsreader', 'Playfair Display', 'Lyon Text', Georgia, serif;
+  --font-mono: 'Geist Mono', 'SF Mono', 'JetBrains Mono', Menlo, Monaco, Consolas, monospace;
+
+  /* Radii (Crisp & Utilitarian) */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+
+  /* Motion & Easing */
+  --ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 240ms;
+
+  /* Subtle Minimalist Elevation */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.02), 0 0 0 1px var(--border-light);
+  --shadow-card-hover: 0 2px 8px rgba(0, 0, 0, 0.04), 0 0 0 1px var(--border-strong);
+  --shadow-modal: 0 16px 40px -8px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--border-light);
+  --shadow-drawer: -4px 0 24px -4px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--border-light);
+}

@@ -1,0 +1,75 @@
+/* ==========================================================================
+   Footer Component — editorial minimal compact bar
+   ========================================================================== */
+
+.app-footer {
+  border-top: 1px solid var(--border-light);
+  background: var(--bg-surface);
+  padding: 12px 0;
+  flex-shrink: 0;
+}
+
+.footer-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.footer-logo {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.footer-sep {
+  color: var(--text-muted);
+}
+
+.footer-privacy {
+  color: var(--text-secondary);
+}
+
+.footer-shortcuts {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 10.5px;
+  color: var(--text-secondary);
+}
+
+.shortcut-item kbd {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  padding: 1px 4px;
+  background: var(--bg-surface-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xs);
+  color: var(--text-primary);
+  margin-right: 3px;
+}
+
+.footer-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.status-indicator-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--pastel-green-text);
+}

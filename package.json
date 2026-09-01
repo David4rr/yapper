@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Token Compression & Prompt Translation Engine",
   "scripts": {
-    "build": "bun build js/app.js --outfile app.js --target browser --minify",
+    "build": "bun build js/app.js --outfile app.js --target browser --minify && bun build css/main.css --outfile css/main.css --minify",
+    "build:js": "bun build js/app.js --outfile app.js --target browser --minify",
+    "build:css": "bun build css/main.css --outfile css/main.css --minify",
     "dev": "bun build js/app.js --outfile app.js --target browser --watch"
   },
   "devDependencies": {}

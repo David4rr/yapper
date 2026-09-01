@@ -1,0 +1,24 @@
+/* ==========================================================================
+   Utilities & Responsive Adjustments
+   ========================================================================== */
+
+.hidden {
+  display: none !important;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 860px) {
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-input {
+    border-right: none;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .workspace-intro {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
