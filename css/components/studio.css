@@ -14,10 +14,10 @@
 }
 
 .app-workspace-container {
-  max-width: 1240px;
+  max-width: var(--container-max-width);
   width: 100%;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 var(--container-pad);
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -51,13 +51,13 @@
 .intro-headline {
   font-family: var(--font-serif);
   font-weight: 400;
-  font-size: clamp(20px, 2.5vw, 26px);
+  font-size: clamp(20px, 3.2vw, 28px);
   line-height: 1.15;
   letter-spacing: -0.02em;
   color: var(--text-primary);
+  text-wrap: balance;
   transition: color var(--duration-fast) var(--ease-smooth);
 }
-
 /* --- Bespoke Single-Button Mode Switcher --- */
 .intro-right {
   display: flex;
@@ -266,7 +266,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .window-controls {
@@ -288,15 +290,20 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .title-sep {
   color: var(--text-muted);
+  flex-shrink: 0;
 }
-
 .window-meta {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .window-chip {
@@ -306,8 +313,8 @@
   background: var(--bg-surface);
   padding: 1px 5px;
   border-radius: var(--radius-xs);
+  white-space: nowrap;
 }
-
 /* Workspace Grid (50/50 split) */
 .workspace-grid {
   display: grid;

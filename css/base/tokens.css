@@ -65,4 +65,10 @@
   --shadow-card-hover: 0 2px 8px rgba(0, 0, 0, 0.04), 0 0 0 1px var(--border-strong);
   --shadow-modal: 0 16px 40px -8px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--border-light);
   --shadow-drawer: -4px 0 24px -4px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--border-light);
+
+  /* Responsive Spacing & Ergonomics */
+  --container-max-width: 1240px;
+  --container-pad: 20px;
+  --container-pad-mobile: 12px;
+  --touch-target-min: 44px;
 }

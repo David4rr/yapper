@@ -1,26 +1,33 @@
 /* ==========================================================================
-   Utilities & Responsive Adjustments
+   Utilities & Master Responsive Adjustments
    ========================================================================== */
 
 .hidden {
   display: none !important;
 }
 
-/* --- Responsive Adjustments --- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- Medium Devices & Tablets (<= 860px) --- */
 @media (max-width: 860px) {
-  .workspace-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .panel-input {
-    border-right: none;
-    border-bottom: 1px solid var(--border-light);
-  }
-
   .workspace-intro {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
+    gap: 14px;
+  }
+
+  .intro-left {
+    max-width: 100%;
   }
 
   .intro-right {
@@ -29,6 +36,140 @@
 
   .btn-mode-toggle {
     width: 100%;
+    height: 42px;
+    padding: 0 12px;
+  }
+
+  .window-chrome {
+    min-height: auto;
+  }
+
+  .workspace-grid {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .panel-input {
+    border-right: none;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .code-textarea {
+    min-height: 200px;
+  }
+
+  .output-wrapper {
+    min-height: 200px;
+  }
+}
+
+/* --- Small Devices & Phones (<= 640px) --- */
+@media (max-width: 640px) {
+  .main-app-content {
+    padding: 12px 0 24px 0;
+  }
+
+  .app-workspace-container {
+    padding: 0 var(--container-pad-mobile);
+    gap: 12px;
+  }
+
+  .intro-headline {
+    font-size: 22px;
+    line-height: 1.2;
+  }
+
+  .window-titlebar {
+    height: 34px;
+    padding: 0 10px;
+  }
+
+  .window-controls {
+    gap: 4px;
+  }
+
+  .panel-header {
+    padding: 10px 12px;
+  }
+
+  .panel-footer {
+    padding: 10px 12px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .keystroke-hints {
+    display: none;
+  }
+
+  .btn-primary-cta {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+    font-size: 13.5px;
+  }
+
+  .analytics-bar {
+    padding: 10px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .metric-group {
+    width: 100%;
     justify-content: space-between;
+  }
+
+  .metric-readout {
+    width: 100%;
+    justify-content: space-between;
+    font-size: 11px;
+  }
+
+  .code-textarea,
+  .output-content {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+}
+
+/* --- Ultra-Compact Devices (<= 390px) --- */
+@media (max-width: 390px) {
+  .panel-header {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .panel-stats {
+    font-size: 10px;
+  }
+
+  .window-title {
+    font-size: 10.5px;
+  }
+
+  .window-chip {
+    display: none;
+  }
+
+  .btn-action-outline {
+    padding: 4px 6px;
+    font-size: 11px;
+  }
+}
+
+/* --- Touch Screen Optimizations --- */
+@media (hover: none) and (pointer: coarse) {
+  .btn-ghost-icon,
+  .btn-settings-pill,
+  .btn-text-action,
+  .btn-action-outline {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mode-kbd {
+    display: none;
   }
 }

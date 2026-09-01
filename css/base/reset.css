@@ -17,16 +17,31 @@ html {
   font-family: var(--font-sans);
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  scroll-behavior: smooth;
+  width: 100%;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   min-height: 100dvh;
+  min-height: -webkit-fill-available;
   display: flex;
   flex-direction: column;
   position: relative;
   background-color: var(--bg-canvas);
   color: var(--text-body);
   line-height: 1.5;
+  width: 100%;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 /* Font utilities */

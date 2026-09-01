@@ -16,14 +16,14 @@
 }
 
 .header-container {
-  max-width: 1240px;
+  max-width: var(--container-max-width);
   margin: 0 auto;
   height: 100%;
-  padding: 0 20px;
+  padding: 0 var(--container-pad);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
 }
 
 /* Brand */
@@ -206,4 +206,61 @@
   background: var(--pastel-green-bg);
   color: var(--pastel-green-text);
   border: 1px solid var(--pastel-green-border);
+}
+
+/* --- Header Responsive Adaptations --- */
+@media (max-width: 640px) {
+  .app-header {
+    height: 52px;
+  }
+
+  .header-container {
+    padding: 0 var(--container-pad-mobile);
+    gap: 8px;
+  }
+
+  .brand-logo {
+    height: 26px;
+  }
+
+  .header-nav-actions {
+    gap: 6px;
+  }
+
+  .btn-ghost-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .btn-settings-pill {
+    height: 36px;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .status-badge {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+
+  .status-label,
+  .status-text {
+    display: none;
+  }
+
+  .key-status-badge {
+    display: none;
+  }
+
+  .btn-settings-pill {
+    padding: 4px 8px;
+  }
+}
+
+@media (hover: none) {
+  .btn-tooltip {
+    display: none;
+  }
 }
