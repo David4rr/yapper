@@ -6,8 +6,8 @@
 import { BASE_SYSTEM_PROMPT, MODE_CONFIGS, MODES, PROVIDER_DEFAULTS } from '../config/constants.js';
 import { StorageModel } from '../models/StorageModel.js';
 import { LLMService } from '../services/LLMService.js';
+import { detectLanguage } from '../utils/langDetect.js';
 import { estimateTokens } from '../utils/tokenEstimator.js';
-
 export class AppController {
   constructor({ state, historyModel, studioView, settingsView, historyView, toastView, confirmDialogView }) {
     this.state = state;
@@ -105,9 +105,11 @@ export class AppController {
   // ---------------------------------------------------------------------------
 
   updateInputMetrics(text) {
-    const tokens = estimateTokens(text, 'id');
+    const langInfo = detectLanguage(text);
+    const tokens = estimateTokens(text, langInfo.isIndonesian ? 'id' : 'en');
     const chars = text ? text.length : 0;
     this.studioView.renderInputMetrics(tokens, chars);
+    this.studioView.renderLanguageBadge(langInfo);
   }
 
   updateOutputMetrics(outputText, startTime = null) {
@@ -418,6 +420,12 @@ export class AppController {
       else this.historyView.open();
     }
 
+    if (cmdKey && e.key.toLowerCase() === 'm') {
+      e.preventDefault();
+      const currentMode = this.state.get('mode') || MODES.PROMPT;
+      const nextMode = currentMode === MODES.PROMPT ? MODES.TRANSLATE : MODES.PROMPT;
+      this.handleModeChange(nextMode);
+    }
     if (cmdKey && e.shiftKey && e.key.toLowerCase() === 'c') {
       if (this.studioView.getOutputText()) {
         e.preventDefault();

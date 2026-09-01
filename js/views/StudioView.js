@@ -8,6 +8,10 @@ import { MODE_CONFIGS, MODES } from '../config/constants.js';
 export class StudioView {
   constructor() {
     // Mode Switcher Elements
+    this.btnModeToggle = document.getElementById('btn-mode-toggle');
+    this.modeToggleName = document.getElementById('mode-toggle-name');
+    this.modeToggleBadge = document.getElementById('mode-toggle-badge');
+    this.modeToggleIcon = document.getElementById('mode-toggle-icon');
     this.modePills = document.querySelectorAll('.mode-pill');
     this.introKicker = document.getElementById('intro-kicker');
     this.introHeadline = document.getElementById('intro-headline');
@@ -18,13 +22,14 @@ export class StudioView {
     this.hintSubmit = document.getElementById('hint-submit');
     this.emptyDesc = document.getElementById('empty-desc');
 
-    // Inputs & Metrics
+    // Inputs & Metrics & Language Auto-detect
     this.rawInput = document.getElementById('raw-input');
+    this.inputLangBadge = document.getElementById('input-lang-badge');
+    this.windowTitleInput = document.getElementById('window-title-input');
     this.btnSubmit = document.getElementById('btn-submit');
     this.btnClearInput = document.getElementById('btn-clear-input');
     this.inputTokens = document.getElementById('input-tokens');
     this.inputChars = document.getElementById('input-chars');
-
     // Output & Metrics
     this.emptyState = document.getElementById('empty-state');
     this.outputContent = document.getElementById('output-content');
@@ -64,6 +69,24 @@ export class StudioView {
     if (this.inputChars) this.inputChars.textContent = `${chars} chars`;
   }
 
+  renderLanguageBadge(langInfo = {}) {
+    if (!this.inputLangBadge) return;
+    const code = langInfo.code || 'AUTO';
+    this.inputLangBadge.textContent = code;
+    this.inputLangBadge.className = `badge-lang font-mono ${
+      code === 'ID' ? 'pastel-yellow' : code === 'EN' ? 'pastel-blue' : 'pastel-gray'
+    }`;
+    this.inputLangBadge.title = `Detected Language: ${langInfo.name || 'Auto Detect'}`;
+
+    // Micro-pop pulse animation
+    this.inputLangBadge.classList.remove('badge-pop');
+    void this.inputLangBadge.offsetWidth;
+    this.inputLangBadge.classList.add('badge-pop');
+
+    if (this.windowTitleInput) {
+      this.windowTitleInput.textContent = code === 'EN' ? 'raw-input.en' : 'raw-input.id';
+    }
+  }
   renderOutputMetrics(inTokens, outTokens, elapsedMs = null) {
     if (this.outputTokens) this.outputTokens.textContent = `${outTokens} tok`;
 
@@ -150,8 +173,29 @@ export class StudioView {
   }
   setMode(mode = MODES.PROMPT) {
     const config = MODE_CONFIGS[mode] || MODE_CONFIGS[MODES.PROMPT];
+    const isTranslate = mode === MODES.TRANSLATE;
 
-    // Update active mode tab state
+    // Update unique single toggle button
+    if (this.btnModeToggle) {
+      this.btnModeToggle.dataset.mode = mode;
+      this.btnModeToggle.setAttribute('aria-label', `Current mode: ${config.name}. Click to switch mode`);
+      this.btnModeToggle.classList.toggle('mode-translate', isTranslate);
+      this.btnModeToggle.classList.toggle('mode-prompt', !isTranslate);
+
+      if (this.modeToggleName) {
+        this.modeToggleName.textContent = config.name;
+      }
+      if (this.modeToggleBadge) {
+        this.modeToggleBadge.textContent = config.shortName;
+      }
+
+      // Trigger subtle pulse transition
+      this.btnModeToggle.classList.remove('pulse-mode');
+      void this.btnModeToggle.offsetWidth;
+      this.btnModeToggle.classList.add('pulse-mode');
+    }
+
+    // Update pills if present
     if (this.modePills) {
       this.modePills.forEach(pill => {
         const isActive = pill.dataset.mode === mode;
@@ -250,6 +294,13 @@ export class StudioView {
     }
   }
   bindModeChange(handler) {
+    if (this.btnModeToggle) {
+      this.btnModeToggle.addEventListener('click', () => {
+        const currentMode = this.btnModeToggle.dataset.mode || MODES.PROMPT;
+        const nextMode = currentMode === MODES.PROMPT ? MODES.TRANSLATE : MODES.PROMPT;
+        handler(nextMode);
+      });
+    }
     if (this.modePills && this.modePills.length > 0) {
       this.modePills.forEach(pill => {
         pill.addEventListener('click', (e) => {

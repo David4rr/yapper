@@ -64,20 +64,32 @@
           <h1 id="intro-headline" class="intro-headline">Transform informal Indonesian into dense English system prompts.</h1>
         </div>
         <div class="intro-right">
-          <div class="mode-selector-group font-mono" role="tablist" aria-label="Transformation Mode">
-            <button type="button" class="mode-pill active" data-mode="prompt" role="tab" aria-selected="true" id="mode-btn-prompt" title="Compress informal text into dense English system prompt">
-              <svg class="mode-pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          <button type="button" id="btn-mode-toggle" class="btn-mode-toggle mode-prompt" aria-label="Toggle transformation mode (⌘M)" title="Toggle transformation mode (⌘M)">
+            <span class="mode-toggle-state">
+              <span class="mode-icon-box" aria-hidden="true">
+                <!-- Lightning / Prompt icon -->
+                <svg class="mode-icon icon-prompt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                <!-- Globe / Translate icon -->
+                <svg class="mode-icon icon-translate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+              </span>
+              <span id="mode-toggle-name" class="mode-toggle-title">System Prompt</span>
+            </span>
+            <span class="mode-toggle-action">
+              <svg class="mode-swap-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="17 1 21 5 17 9"></polyline>
+                <path d="M3 5h18"></path>
+                <polyline points="7 23 3 19 7 15"></polyline>
+                <path d="M21 19H3"></path>
               </svg>
-              <span>System Prompt</span>
-            </button>
-            <button type="button" class="mode-pill" data-mode="translate" role="tab" aria-selected="false" id="mode-btn-translate" title="Natural, fluent, and grammatically accurate English translation">
-              <svg class="mode-pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"></path>
-              </svg>
-              <span>Natural Translation</span>
-            </button>
-          </div>
+              <kbd class="mode-kbd font-mono">⌘M</kbd>
+            </span>
+          </button>
         </div>
       </div>
 
@@ -91,7 +103,7 @@
             <span class="control-dot"></span>
           </div>
           <div class="window-title font-mono">
-            <span>raw-input.id</span>
+            <span id="window-title-input">raw-input.id</span>
             <span class="title-sep">&rarr;</span>
             <span id="window-title-output">compressed-prompt.en</span>
           </div>
@@ -106,8 +118,8 @@
           <div class="panel panel-input" aria-labelledby="input-heading">
             <div class="panel-header">
               <div class="panel-meta">
-                <span class="badge-lang pastel-yellow font-mono">ID</span>
-                <h2 id="input-heading" class="panel-heading">Raw Informal Input</h2>
+                <span id="input-lang-badge" class="badge-lang pastel-yellow font-mono" title="Language: Auto-detected">ID</span>
+                <h2 id="input-heading" class="panel-heading">Raw Input</h2>
               </div>
               <div class="panel-stats font-mono" id="input-stats">
                 <span id="input-tokens" class="stat-item">0 tok</span>
@@ -239,6 +251,7 @@
       <div class="footer-shortcuts font-mono">
         <span class="shortcut-item"><kbd>⌘K</kbd> Settings</span>
         <span class="shortcut-item"><kbd>⌘H</kbd> History</span>
+        <span class="shortcut-item"><kbd>⌘M</kbd> Mode</span>
         <span class="shortcut-item"><kbd>⌘⏎</kbd> Execute</span>
       </div>
       <div class="footer-status font-mono">

@@ -27,13 +27,8 @@
     width: 100%;
   }
 
-  .mode-selector-group {
+  .btn-mode-toggle {
     width: 100%;
-    display: flex;
-  }
-
-  .mode-pill {
-    flex: 1;
-    justify-content: center;
+    justify-content: space-between;
   }
 }
