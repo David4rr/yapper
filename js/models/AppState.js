@@ -12,6 +12,7 @@ export class AppState {
       storageStrategy: 'local', // 'local' | 'session'
       customBaseUrl: 'http://localhost:11434/v1',
       isTranslating: false,
+      mode: 'prompt', // 'prompt' | 'translate'
       ...initialState
     };
     this._listeners = new Set();

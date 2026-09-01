@@ -46,14 +46,15 @@ export class HistoryModel {
     }
   }
 
-  add({ rawInput, outputText, inTokens, outTokens }) {
+  add({ rawInput, outputText, inTokens, outTokens, mode = 'prompt' }) {
     const item = {
       id: 'hist_' + Date.now(),
       timestamp: new Date().toISOString(),
       rawInput: rawInput.trim(),
       outputText: outputText.trim(),
       inTokens,
-      outTokens
+      outTokens,
+      mode
     };
 
     this.history.unshift(item);

@@ -71,18 +71,18 @@ export class LLMService {
    * Execute SSE streaming translation+compression against provider API.
    * @returns {Promise<string>} Full accumulated output text
    */
-  static async streamCompression({ provider, model, apiKey, customBaseUrl, rawInput, onChunk, signal }) {
+  static async streamCompression({ provider, model, apiKey, customBaseUrl, rawInput, systemPrompt = BASE_SYSTEM_PROMPT, onChunk, signal }) {
     if (provider === 'gemini') {
-      return LLMService._streamGemini({ model, apiKey, rawInput, onChunk, signal });
+      return LLMService._streamGemini({ model, apiKey, rawInput, systemPrompt, onChunk, signal });
     }
-    return LLMService._streamOpenAICompat({ provider, model, apiKey, customBaseUrl, rawInput, onChunk, signal });
+    return LLMService._streamOpenAICompat({ provider, model, apiKey, customBaseUrl, rawInput, systemPrompt, onChunk, signal });
   }
 
   // ---------------------------------------------------------------------------
   // Private: provider-specific transports
   // ---------------------------------------------------------------------------
 
-  static async _streamGemini({ model, apiKey, rawInput, onChunk, signal }) {
+  static async _streamGemini({ model, apiKey, rawInput, systemPrompt = BASE_SYSTEM_PROMPT, onChunk, signal }) {
     const endpoint = PROVIDER_DEFAULTS.gemini.endpoint
       .replace('{model}', encodeURIComponent(model))
       .replace('{key}', encodeURIComponent(apiKey));
@@ -90,11 +90,10 @@ export class LLMService {
     const payload = {
       contents: [{
         role: 'user',
-        parts: [{ text: `System Instruction:\n${BASE_SYSTEM_PROMPT}\n\nUser Input to Compress and Translate:\n${rawInput}` }]
+        parts: [{ text: `System Instruction:\n${systemPrompt}\n\nUser Input:\n${rawInput}` }]
       }],
       generationConfig: { temperature: 0.2, maxOutputTokens: 1024 }
     };
-
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -114,7 +113,7 @@ export class LLMService {
     );
   }
 
-  static async _streamOpenAICompat({ provider, model, apiKey, customBaseUrl, rawInput, onChunk, signal }) {
+  static async _streamOpenAICompat({ provider, model, apiKey, customBaseUrl, rawInput, systemPrompt = BASE_SYSTEM_PROMPT, onChunk, signal }) {
     let endpoint = PROVIDER_DEFAULTS[provider]?.endpoint;
     if (provider === 'custom') {
       endpoint = customBaseUrl.replace(/\/+$/, '') + '/chat/completions';
@@ -130,13 +129,12 @@ export class LLMService {
     const payload = {
       model,
       messages: [
-        { role: 'system', content: BASE_SYSTEM_PROMPT },
+        { role: 'system', content: systemPrompt },
         { role: 'user', content: rawInput }
       ],
       temperature: 0.2,
       stream: true
     };
-
     const response = await fetch(endpoint, {
       method: 'POST',
       headers,

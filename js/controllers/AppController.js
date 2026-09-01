@@ -3,7 +3,7 @@
  * Lean event orchestrator: bridges Models and Views, owns no DOM, owns no UI strings.
  */
 
-import { PROVIDER_DEFAULTS } from '../config/constants.js';
+import { BASE_SYSTEM_PROMPT, MODE_CONFIGS, MODES, PROVIDER_DEFAULTS } from '../config/constants.js';
 import { StorageModel } from '../models/StorageModel.js';
 import { LLMService } from '../services/LLMService.js';
 import { estimateTokens } from '../utils/tokenEstimator.js';
@@ -37,6 +37,7 @@ export class AppController {
         model: saved.model,
         apiKey: saved.apiKey,
         customBaseUrl: saved.customBaseUrl,
+        mode: saved.mode || MODES.PROMPT,
         storageStrategy: saved.storageStrategy
       });
       this.historyModel.setStrategy(saved.storageStrategy);
@@ -46,6 +47,7 @@ export class AppController {
   renderInitialUI() {
     this.settingsView.renderConfig(this.state.getAll(), false);
     this.historyView.render(this.historyModel.getAll());
+    this.studioView.setMode(this.state.get('mode') || MODES.PROMPT);
 
     const apiKey = this.state.get('apiKey');
     const provider = this.state.get('provider');
@@ -67,6 +69,7 @@ export class AppController {
     this.studioView.bindSubmit(() => this.executeTranslation());
     this.studioView.bindCopy(() => this.handleCopy());
     this.studioView.bindDownload(() => this.handleExport());
+    this.studioView.bindModeChange(mode => this.handleModeChange(mode));
 
     // Settings
     this.settingsView.bindToggle(() => this.settingsView.open());
@@ -240,6 +243,19 @@ export class AppController {
       }
     });
   }
+  // ---------------------------------------------------------------------------
+  // Mode handlers
+  // ---------------------------------------------------------------------------
+
+  handleModeChange(mode) {
+    if (this.state.get('mode') === mode) return;
+    this.state.set('mode', mode);
+    this.studioView.setMode(mode);
+    const config = this.state.getAll();
+    StorageModel.saveConfig(config, config.storageStrategy);
+    const modeName = mode === MODES.TRANSLATE ? 'Natural Translation' : 'System Prompt';
+    this.toastView.show(`Mode aktif: ${modeName}`, 'normal');
+  }
 
   // ---------------------------------------------------------------------------
   // History handlers
@@ -321,7 +337,8 @@ export class AppController {
     const apiKey = this.state.get('apiKey');
     const model = this.state.get('model');
     const customBaseUrl = this.state.get('customBaseUrl');
-
+    const mode = this.state.get('mode') || MODES.PROMPT;
+    const systemPrompt = MODE_CONFIGS[mode]?.systemPrompt || BASE_SYSTEM_PROMPT;
     if (!apiKey && provider !== 'custom') {
       this.toastView.show('Masukkan API Key Anda di Pengaturan untuk memproses prompt!', 'error');
       this.settingsView.open();
@@ -342,6 +359,7 @@ export class AppController {
         apiKey,
         customBaseUrl,
         rawInput,
+        systemPrompt,
         onChunk: (_chunk, accumulated) => {
           this.studioView.showOutput(accumulated);
           this.updateOutputMetrics(accumulated, startTime);
@@ -352,11 +370,13 @@ export class AppController {
       const inTokens = estimateTokens(rawInput, 'id');
       const outTokens = estimateTokens(finalResult, 'en');
 
-      this.historyModel.add({ rawInput, outputText: finalResult, inTokens, outTokens });
+      this.historyModel.add({ rawInput, outputText: finalResult, inTokens, outTokens, mode });
       this.historyView.render(this.historyModel.getAll());
       this.updateOutputMetrics(finalResult, startTime);
-      this.toastView.show('Prompt berhasil dikompresi & diterjemahkan!', 'success');
-
+      const successMsg = mode === MODES.TRANSLATE
+        ? 'Teks berhasil diterjemahkan ke bahasa Inggris alami!'
+        : 'Prompt berhasil dikompresi & diterjemahkan!';
+      this.toastView.show(successMsg, 'success');
     } catch (err) {
       if (err.name === 'AbortError') {
         this.toastView.show('Proses dibatalkan.', 'normal');

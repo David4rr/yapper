@@ -53,14 +53,16 @@ export class HistoryView {
     this.list.innerHTML = items.map(item => {
       const date = new Date(item.timestamp);
       const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const isTranslate = item.mode === 'translate';
+      const modeLabel = isTranslate ? 'TRANSLATE' : 'COMPRESSED';
       const savings = item.inTokens > 0 ? Math.round(((item.inTokens - item.outTokens) / item.inTokens) * 100) : 0;
 
       return `
         <div class="history-item" data-id="${item.id}" tabindex="0" role="button" aria-label="Restore prompt history">
           <div class="history-item-meta">
             <div class="history-item-meta-info">
-              <span>${timeStr} · COMPRESSED</span>
-              <span class="badge-saving">${savings > 0 ? `-${savings}%` : '0%'}</span>
+              <span>${timeStr} · ${modeLabel}</span>
+              <span class="badge-saving">${savings > 0 ? `-${savings}%` : isTranslate ? '0%' : '0%'}</span>
             </div>
             <button class="btn-history-item-delete" data-id="${item.id}" type="button" title="Delete this prompt" aria-label="Delete entry">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

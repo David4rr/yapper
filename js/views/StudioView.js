@@ -1,10 +1,23 @@
 /**
  * StudioView
- * Manages the core workspace UI (Input, Output, Metrics Telemetry, Actions)
+ * Manages the core workspace UI (Input, Output, Metrics Telemetry, Actions, Mode Switcher)
  */
+
+import { MODE_CONFIGS, MODES } from '../config/constants.js';
 
 export class StudioView {
   constructor() {
+    // Mode Switcher Elements
+    this.modePills = document.querySelectorAll('.mode-pill');
+    this.introKicker = document.getElementById('intro-kicker');
+    this.introHeadline = document.getElementById('intro-headline');
+    this.outputHeading = document.getElementById('output-heading');
+    this.windowTitleOutput = document.getElementById('window-title-output');
+    this.windowModeChip = document.getElementById('window-mode-chip');
+    this.submitBtnText = document.querySelector('#btn-submit .btn-text');
+    this.hintSubmit = document.getElementById('hint-submit');
+    this.emptyDesc = document.getElementById('empty-desc');
+
     // Inputs & Metrics
     this.rawInput = document.getElementById('raw-input');
     this.btnSubmit = document.getElementById('btn-submit');
@@ -135,6 +148,44 @@ export class StudioView {
       this.btnCopy.classList.remove('copied');
     }
   }
+  setMode(mode = MODES.PROMPT) {
+    const config = MODE_CONFIGS[mode] || MODE_CONFIGS[MODES.PROMPT];
+
+    // Update active mode tab state
+    if (this.modePills) {
+      this.modePills.forEach(pill => {
+        const isActive = pill.dataset.mode === mode;
+        pill.classList.toggle('active', isActive);
+        pill.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+    }
+
+    // Update UI headers & context
+    if (this.introKicker && config.kicker) {
+      this.introKicker.textContent = config.kicker;
+    }
+    if (this.introHeadline && config.headline) {
+      this.introHeadline.textContent = config.headline;
+    }
+    if (this.outputHeading && config.outputHeading) {
+      this.outputHeading.textContent = config.outputHeading;
+    }
+    if (this.submitBtnText && config.submitText) {
+      this.submitBtnText.textContent = config.submitText;
+    }
+    if (this.windowTitleOutput && config.windowTitle) {
+      this.windowTitleOutput.textContent = config.windowTitle;
+    }
+    if (this.windowModeChip && config.badge) {
+      this.windowModeChip.textContent = config.badge;
+    }
+    if (this.hintSubmit && config.hint) {
+      this.hintSubmit.innerHTML = `<kbd>⌘</kbd>+<kbd>Enter</kbd> ${config.hint}`;
+    }
+    if (this.emptyDesc && config.emptyDesc) {
+      this.emptyDesc.innerHTML = config.emptyDesc;
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // Self-contained DOM actions — controller MUST call these instead of direct DOM
@@ -196,6 +247,16 @@ export class StudioView {
   bindDownload(handler) {
     if (this.btnDownload) {
       this.btnDownload.addEventListener('click', handler);
+    }
+  }
+  bindModeChange(handler) {
+    if (this.modePills && this.modePills.length > 0) {
+      this.modePills.forEach(pill => {
+        pill.addEventListener('click', (e) => {
+          const mode = e.currentTarget.dataset.mode;
+          if (mode) handler(mode);
+        });
+      });
     }
   }
 }

@@ -57,11 +57,27 @@
   <main class="main-app-content">
     <div class="app-workspace-container">
       
-      <!-- Compact Editorial Title & Context -->
+      <!-- Compact Editorial Title & Context + Mode Switcher -->
       <div class="workspace-intro">
         <div class="intro-left">
-          <span class="intro-kicker font-mono">[ TOKEN OPTIMIZATION &middot; SYSTEM PROMPT TRANSLATOR ]</span>
-          <h1 class="intro-headline">Transform informal Indonesian into dense English system prompts.</h1>
+          <span id="intro-kicker" class="intro-kicker font-mono">[ TOKEN OPTIMIZATION &middot; SYSTEM PROMPT TRANSLATOR ]</span>
+          <h1 id="intro-headline" class="intro-headline">Transform informal Indonesian into dense English system prompts.</h1>
+        </div>
+        <div class="intro-right">
+          <div class="mode-selector-group font-mono" role="tablist" aria-label="Transformation Mode">
+            <button type="button" class="mode-pill active" data-mode="prompt" role="tab" aria-selected="true" id="mode-btn-prompt" title="Compress informal text into dense English system prompt">
+              <svg class="mode-pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+              <span>System Prompt</span>
+            </button>
+            <button type="button" class="mode-pill" data-mode="translate" role="tab" aria-selected="false" id="mode-btn-translate" title="Natural, fluent, and grammatically accurate English translation">
+              <svg class="mode-pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"></path>
+              </svg>
+              <span>Natural Translation</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -77,11 +93,10 @@
           <div class="window-title font-mono">
             <span>raw-input.id</span>
             <span class="title-sep">&rarr;</span>
-            <span>compressed-prompt.en</span>
+            <span id="window-title-output">compressed-prompt.en</span>
           </div>
           <div class="window-meta font-mono">
-            <span class="window-chip">Zero-Fluff BPE</span>
-          </div>
+            <span id="window-mode-chip" class="window-chip">Zero-Fluff BPE</span>
         </div>
 
         <!-- Studio Grid Split -->
@@ -122,7 +137,7 @@
 
             <div class="panel-footer">
               <div class="keystroke-hints font-mono">
-                <span class="hint-key"><kbd>⌘</kbd>+<kbd>Enter</kbd> Compress</span>
+                <span id="hint-submit" class="hint-key"><kbd>⌘</kbd>+<kbd>Enter</kbd> Compress</span>
                 <span class="hint-key"><kbd>Esc</kbd> Clear</span>
               </div>
               <button id="btn-submit" class="btn-primary-cta" aria-label="Compress and Translate Prompt">
@@ -182,7 +197,7 @@
                   </svg>
                 </div>
                 <h3 class="empty-title">Awaiting Input</h3>
-                <p class="empty-desc">
+                <p id="empty-desc" class="empty-desc">
                   Enter raw Indonesian text on the left panel, then press <kbd>⌘</kbd> + <kbd>Enter</kbd> to compile into a dense English prompt.
                 </p>
               </div>

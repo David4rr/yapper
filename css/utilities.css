@@ -19,6 +19,21 @@
 
   .workspace-intro {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .intro-right {
+    width: 100%;
+  }
+
+  .mode-selector-group {
+    width: 100%;
+    display: flex;
+  }
+
+  .mode-pill {
+    flex: 1;
+    justify-content: center;
   }
 }

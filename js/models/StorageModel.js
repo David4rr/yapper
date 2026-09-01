@@ -23,6 +23,7 @@ export class StorageModel {
           model: parsed.model || 'llama-3.3-70b-versatile',
           apiKey: parsed.apiKey || '',
           customBaseUrl: parsed.customBaseUrl || 'http://localhost:11434/v1',
+          mode: parsed.mode || 'prompt',
           storageStrategy: strategy
         };
       } catch (err) {
@@ -38,7 +39,8 @@ export class StorageModel {
       provider: configData.provider,
       model: configData.model,
       apiKey: configData.apiKey,
-      customBaseUrl: configData.customBaseUrl
+      customBaseUrl: configData.customBaseUrl,
+      mode: configData.mode || 'prompt'
     });
 
     if (strategy === 'local') {

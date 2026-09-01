@@ -2,7 +2,7 @@
  * Application Constants & Provider Configurations
  */
 
-export const BASE_SYSTEM_PROMPT = `You are a high-precision Telegraphic Prompt Optimization Engine.
+export const PROMPT_SYSTEM_PROMPT = `You are a high-precision Telegraphic Prompt Optimization Engine.
 Convert raw, informal, or unstructured inputs (Indonesian or casual English) into ultra-dense, token-minimized, production-grade English prompt directives.
 
 Core Directives:
@@ -12,6 +12,54 @@ Core Directives:
 4. Concise Structure: Single tasks -> 1–2 crisp imperative sentences. Multi-requirement tasks -> tight bulleted directives.
 5. Strict Output Only: Output ONLY the compiled English prompt. Absolutely NO intro, NO explanations, and NO surrounding quotation marks.`;
 
+export const TRANSLATE_SYSTEM_PROMPT = `You are an expert Indonesian-to-English translator specializing in fluent, natural, and idiomatic modern English.
+Translate raw, casual, slang-heavy, conversational, or formal Indonesian inputs into smooth, grammatically sound, natural-sounding English.
+
+Translation Rules:
+1. Natural & Idiomatic English: NEVER do literal, word-for-word, or mechanical translation. Translate the authentic meaning, intent, and conversational flow so it reads like it was originally written by a native English speaker.
+2. Slang, Colloquialisms & Nuance: Accurately resolve Indonesian slang (bahasa gaul, Jaksel, prokem, internet abbreviations like "baper", "gabut", "mager", "kepo", "wkwk", "ngab", "cuy", "ribet", "kudu", "santai aja", "gimana") and emphatic discourse particles ("dong", "sih", "deh", "lah", "kok", "kan") into their natural English conversational equivalents or tone.
+3. Grammatical Accuracy & Flow: Ensure flawless English grammar, appropriate verb tenses, natural collocations, correct prepositions, and smooth sentence rhythm. Do not sound stiff, robotic, or overly academic unless the source text is formal.
+4. Tone & Context Preservation: Match the register of the original text (casual conversation -> natural casual English; technical remark -> clean technical English; business/formal request -> polished professional English).
+5. Technical Terms & Loanwords: Keep established technical jargon, library/framework names, and code identifiers exact while translating the surrounding context fluidly.
+6. Strict Output Only: Output ONLY the translated English text. Do NOT include explanations, phonetic transcriptions, alternative options, notes, or surrounding quotes.`;
+
+export const BASE_SYSTEM_PROMPT = PROMPT_SYSTEM_PROMPT;
+
+export const MODES = {
+  PROMPT: 'prompt',
+  TRANSLATE: 'translate'
+};
+
+export const MODE_CONFIGS = {
+  [MODES.PROMPT]: {
+    id: 'prompt',
+    name: 'System Prompt',
+    shortName: 'Prompt',
+    kicker: '[ TOKEN OPTIMIZATION · SYSTEM PROMPT TRANSLATOR ]',
+    headline: 'Transform informal Indonesian into dense English system prompts.',
+    outputHeading: 'Compressed System Prompt',
+    submitText: 'Compress & Translate',
+    windowTitle: 'compressed-prompt.en',
+    badge: 'Zero-Fluff BPE',
+    hint: 'Compress',
+    emptyDesc: 'Enter raw Indonesian text on the left panel, then press <kbd>⌘</kbd> + <kbd>Enter</kbd> to compile into a dense English prompt.',
+    systemPrompt: PROMPT_SYSTEM_PROMPT
+  },
+  [MODES.TRANSLATE]: {
+    id: 'translate',
+    name: 'Natural Translation',
+    shortName: 'Translate',
+    kicker: '[ NATURAL TRANSLATION · FLUENT & GRAMMATICAL ]',
+    headline: 'Translate casual Indonesian into fluent, natural English.',
+    outputHeading: 'Fluent English Translation',
+    submitText: 'Translate to English',
+    windowTitle: 'natural-translation.en',
+    badge: 'Fluent & Idiomatic',
+    hint: 'Translate',
+    emptyDesc: 'Enter raw Indonesian text on the left panel, then press <kbd>⌘</kbd> + <kbd>Enter</kbd> to translate into fluent, natural English.',
+    systemPrompt: TRANSLATE_SYSTEM_PROMPT
+  }
+};
 export const PROVIDER_DEFAULTS = {
   groq: {
     name: 'Groq Cloud',
