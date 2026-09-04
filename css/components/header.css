@@ -186,27 +186,6 @@
   transform: scale(0.97);
 }
 
-/* API key status badge inside settings pill */
-.key-status-badge {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 2px 5px;
-  border-radius: var(--radius-pill);
-}
-
-.key-status-badge.not-configured {
-  background: var(--pastel-yellow-bg);
-  color: var(--pastel-yellow-text);
-  border: 1px solid var(--pastel-yellow-border);
-}
-
-.key-status-badge.configured {
-  background: var(--pastel-green-bg);
-  color: var(--pastel-green-text);
-  border: 1px solid var(--pastel-green-border);
-}
 
 /* --- Header Responsive Adaptations --- */
 @media (max-width: 640px) {
@@ -250,9 +229,6 @@
     display: none;
   }
 
-  .key-status-badge {
-    display: none;
-  }
 
   .btn-settings-pill {
     padding: 4px 8px;

@@ -426,17 +426,38 @@ export class AppController {
       const nextMode = currentMode === MODES.PROMPT ? MODES.TRANSLATE : MODES.PROMPT;
       this.handleModeChange(nextMode);
     }
-    if (cmdKey && e.shiftKey && e.key.toLowerCase() === 'c') {
-      if (this.studioView.getOutputText()) {
-        e.preventDefault();
-        this.handleCopy();
+    const isCopyKey = (e.key && e.key.toLowerCase() === 'c') || e.code === 'KeyC';
+    if (cmdKey && isCopyKey) {
+      const hasOutput = Boolean(this.studioView.getOutputText());
+      if (e.shiftKey) {
+        if (hasOutput) {
+          e.preventDefault();
+          this.handleCopy();
+        }
+      } else {
+        const selection = window.getSelection()?.toString() || '';
+        const isEditingInput = document.activeElement && (document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT');
+        if (!selection && !isEditingInput && hasOutput) {
+          e.preventDefault();
+          this.handleCopy();
+        }
       }
     }
 
     if (e.key === 'Escape') {
-      if (this.confirmDialogView.isOpen()) this.confirmDialogView.close();
-      else if (this.settingsView.isOpen()) this.settingsView.close();
-      else if (this.historyView.isOpen()) this.historyView.close();
+      if (this.confirmDialogView.isOpen()) {
+        this.confirmDialogView.close();
+      } else if (this.settingsView.isOpen()) {
+        this.settingsView.close();
+      } else if (this.historyView.isOpen()) {
+        this.historyView.close();
+      } else {
+        e.preventDefault();
+        if (this._abortController) {
+          this._abortController.abort();
+        }
+        this.studioView.clearAll();
+      }
     }
   }
 }

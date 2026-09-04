@@ -33,8 +33,7 @@ export class SettingsView {
     this.baseUrlInput = document.getElementById('base-url-input');
     this.storageRadios = document.querySelectorAll('input[name="storage-strategy"]');
 
-    // Header Status Chips
-    this.keyBadge = document.getElementById('key-badge');
+    // Header Status
     this.connectionStatus = document.getElementById('connection-status');
     this.statusText = document.getElementById('status-text');
   }
@@ -83,16 +82,6 @@ export class SettingsView {
     // Header badges
     const provName = PROVIDER_DEFAULTS[config.provider]?.name?.split(' ')[0] || 'API';
     const isConfigured = Boolean(config.apiKey || config.provider === 'custom');
-
-    if (this.keyBadge) {
-      if (isConfigured) {
-        this.keyBadge.textContent = 'Active';
-        this.keyBadge.className = 'key-status-badge configured';
-      } else {
-        this.keyBadge.textContent = 'Setup';
-        this.keyBadge.className = 'key-status-badge not-configured';
-      }
-    }
 
     if (this.connectionStatus && this.statusText) {
       if (isTranslating) {

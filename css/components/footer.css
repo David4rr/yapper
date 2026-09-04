@@ -41,6 +41,9 @@
   color: var(--text-secondary);
 }
 
+.footer-version {
+  color: var(--text-secondary);
+}
 .footer-shortcuts {
   display: flex;
   align-items: center;
@@ -60,20 +63,6 @@
   margin-right: 3px;
 }
 
-.footer-status {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 10.5px;
-  color: var(--text-muted);
-}
-
-.status-indicator-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--pastel-green-text);
-}
 
 /* --- Footer Responsive Adaptations --- */
 @media (max-width: 768px) {
