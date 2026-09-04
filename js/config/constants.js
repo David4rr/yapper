@@ -66,10 +66,11 @@ export const PROVIDER_DEFAULTS = {
     defaultModel: 'llama-3.3-70b-versatile',
     endpoint: 'https://api.groq.com/openai/v1/chat/completions',
     modelsEndpoint: 'https://api.groq.com/openai/v1/models',
-    keyGuide: 'Dapatkan API key gratis di <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>.',
+    placeholder: 'gsk_...',
+    keyGuide: 'Get your free API key at <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>.',
     fallbackModels: [
-      { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B Versatile (Rekomendasi)' },
-      { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B Instant (Ultra Cepat)' },
+      { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B Versatile (Recommended)' },
+      { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B Instant (Ultra-Fast)' },
       { id: 'mixtral-8x7b-32768', name: 'Mixtral 8x7B 32k' },
       { id: 'gemma2-9b-it', name: 'Gemma 2 9B IT' }
     ]
@@ -79,7 +80,8 @@ export const PROVIDER_DEFAULTS = {
     defaultModel: 'meta-llama/llama-3.3-70b-instruct',
     endpoint: 'https://openrouter.ai/api/v1/chat/completions',
     modelsEndpoint: 'https://openrouter.ai/api/v1/models',
-    keyGuide: 'Dapatkan API key di <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a>.',
+    placeholder: 'sk-or-v1-...',
+    keyGuide: 'Get your API key at <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a>.',
     fallbackModels: [
       { id: 'meta-llama/llama-3.3-70b-instruct', name: 'Llama 3.3 70B Instruct' },
       { id: 'anthropic/claude-3.5-sonnet', name: 'Claude 3.5 Sonnet' },
@@ -92,9 +94,10 @@ export const PROVIDER_DEFAULTS = {
     defaultModel: 'gemini-1.5-flash',
     endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/{model}:streamGenerateContent?alt=sse&key={key}',
     modelsEndpoint: 'https://generativelanguage.googleapis.com/v1beta/models?key={key}',
-    keyGuide: 'Dapatkan API key gratis di <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a>.',
+    placeholder: 'AIzaSy...',
+    keyGuide: 'Get your free API key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a>.',
     fallbackModels: [
-      { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash (Default)' },
+      { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash (Recommended)' },
       { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
       { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' }
     ]
@@ -104,18 +107,20 @@ export const PROVIDER_DEFAULTS = {
     defaultModel: 'gpt-4o-mini',
     endpoint: 'https://api.openai.com/v1/chat/completions',
     modelsEndpoint: 'https://api.openai.com/v1/models',
-    keyGuide: 'Dapatkan API key di <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a>.',
+    placeholder: 'sk-proj-...',
+    keyGuide: 'Get your API key at <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a>.',
     fallbackModels: [
-      { id: 'gpt-4o-mini', name: 'GPT-4o Mini (Hemat & Cepat)' },
-      { id: 'gpt-4o', name: 'GPT-4o (Akurasi Tinggi)' }
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini (Fast & Cost-Effective)' },
+      { id: 'gpt-4o', name: 'GPT-4o (High Accuracy)' }
     ]
   },
   custom: {
-    name: 'Custom / Local (Ollama)',
+    name: 'Custom / Local (Ollama, LM Studio)',
     defaultModel: 'llama3.2',
     endpoint: 'http://localhost:11434/v1/chat/completions',
     modelsEndpoint: 'http://localhost:11434/v1/models',
-    keyGuide: 'Pastikan endpoint lokal Anda (misal Ollama/vLLM) mengizinkan CORS browser origin.',
+    placeholder: 'Optional for local Ollama / vLLM',
+    keyGuide: 'Leave API key blank for local Ollama/LM Studio. Ensure local endpoint allows browser CORS requests.',
     fallbackModels: [
       { id: 'llama3.2', name: 'llama3.2' },
       { id: 'qwen2.5-coder', name: 'qwen2.5-coder' },

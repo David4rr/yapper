@@ -36,6 +36,27 @@ export class SettingsView {
     // Header Status
     this.connectionStatus = document.getElementById('connection-status');
     this.statusText = document.getElementById('status-text');
+    this.apiKeyLabel = document.getElementById('api-key-label');
+
+    this._bindInternalEvents();
+  }
+
+  _bindInternalEvents() {
+    if (this.btnToggleKeyVisibility) {
+      this.btnToggleKeyVisibility.addEventListener('click', () => {
+        this.toggleKeyVisibility();
+      });
+    }
+    if (this.btnToggleModelMode) {
+      this.btnToggleModelMode.addEventListener('click', () => {
+        this.toggleModelMode();
+      });
+    }
+    if (this.modal) {
+      this.modal.addEventListener('click', (e) => {
+        if (e.target === this.modal) this.close();
+      });
+    }
   }
 
   open() {
@@ -50,6 +71,13 @@ export class SettingsView {
       this.modal.classList.remove('open');
       this.modal.setAttribute('aria-hidden', 'true');
     }
+    if (this.apiKeyInput && this.apiKeyInput.type !== 'password') {
+      this.apiKeyInput.type = 'password';
+    }
+    if (this.btnToggleKeyVisibility) {
+      this.btnToggleKeyVisibility.textContent = 'Show Key';
+      this.btnToggleKeyVisibility.setAttribute('aria-label', 'Show API Key');
+    }
   }
 
   isOpen() {
@@ -58,10 +86,23 @@ export class SettingsView {
 
   renderConfig(config, isTranslating = false) {
     if (this.providerSelect) this.providerSelect.value = config.provider;
-    if (this.apiKeyInput) this.apiKeyInput.value = config.apiKey;
+    if (this.apiKeyInput) {
+      this.apiKeyInput.value = config.apiKey;
+      this.apiKeyInput.type = 'password';
+      const def = PROVIDER_DEFAULTS[config.provider];
+      if (def?.placeholder) {
+        this.apiKeyInput.placeholder = def.placeholder;
+      }
+    }
+    if (this.btnToggleKeyVisibility) {
+      this.btnToggleKeyVisibility.textContent = 'Show Key';
+      this.btnToggleKeyVisibility.setAttribute('aria-label', 'Show API Key');
+    }
+    if (this.apiKeyLabel) {
+      this.apiKeyLabel.textContent = config.provider === 'custom' ? 'API Key (Optional)' : 'API Key';
+    }
     if (this.modelInput) this.modelInput.value = config.model;
     if (this.baseUrlInput) this.baseUrlInput.value = config.customBaseUrl;
-
     if (this.storageRadios) {
       this.storageRadios.forEach(radio => {
         radio.checked = (radio.value === config.storageStrategy);
@@ -147,13 +188,10 @@ export class SettingsView {
 
   toggleKeyVisibility() {
     if (!this.apiKeyInput || !this.btnToggleKeyVisibility) return;
-    if (this.apiKeyInput.type === 'password') {
-      this.apiKeyInput.type = 'text';
-      this.btnToggleKeyVisibility.textContent = 'Hide Key';
-    } else {
-      this.apiKeyInput.type = 'password';
-      this.btnToggleKeyVisibility.textContent = 'Show Key';
-    }
+    const isPassword = this.apiKeyInput.type === 'password';
+    this.apiKeyInput.type = isPassword ? 'text' : 'password';
+    this.btnToggleKeyVisibility.textContent = isPassword ? 'Hide Key' : 'Show Key';
+    this.btnToggleKeyVisibility.setAttribute('aria-label', isPassword ? 'Hide API Key' : 'Show API Key');
   }
 
   toggleModelMode() {
@@ -259,20 +297,14 @@ export class SettingsView {
   }
 
   bindToggleKeyVisibility(handler) {
-    if (this.btnToggleKeyVisibility) {
-      this.btnToggleKeyVisibility.addEventListener('click', () => {
-        this.toggleKeyVisibility();
-        if (handler) handler();
-      });
+    if (this.btnToggleKeyVisibility && handler) {
+      this.btnToggleKeyVisibility.addEventListener('click', handler);
     }
   }
 
   bindToggleModelMode(handler) {
-    if (this.btnToggleModelMode) {
-      this.btnToggleModelMode.addEventListener('click', () => {
-        this.toggleModelMode();
-        if (handler) handler();
-      });
+    if (this.btnToggleModelMode && handler) {
+      this.btnToggleModelMode.addEventListener('click', handler);
     }
   }
 

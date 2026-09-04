@@ -300,24 +300,21 @@
       <div class="modal-body">
         <!-- Provider Select -->
         <div class="form-group">
-          <label for="provider-select" class="form-label">
-            LLM Provider
-            <span class="label-badge pastel-green font-mono">Groq Recommended (Fast &amp; Free)</span>
-          </label>
+          <label for="provider-select" class="form-label">LLM Provider</label>
           <select id="provider-select" class="form-select font-mono">
-            <option value="groq">Groq Cloud (Llama 3.3 70B &middot; 300+ tok/s)</option>
-            <option value="openrouter">OpenRouter (Claude 3.5, GPT-4o, Llama)</option>
+            <option value="groq">Groq Cloud (Llama 3.3 70B &middot; Fast &amp; Free)</option>
+            <option value="openrouter">OpenRouter (Claude 3.5, GPT-4o, Llama 3.3)</option>
             <option value="gemini">Google Gemini (Gemini 2.0 Flash / 1.5 Flash)</option>
             <option value="openai">OpenAI (GPT-4o Mini / GPT-4o)</option>
-            <option value="custom">Custom / Ollama Local (http://localhost:11434/v1)</option>
+            <option value="custom">Custom / Local (Ollama, LM Studio, vLLM)</option>
           </select>
         </div>
 
         <!-- API Key Input -->
         <div class="form-group">
           <div class="label-with-action">
-            <label for="api-key-input" class="form-label">API Key</label>
-            <button id="btn-toggle-key-visibility" type="button" class="link-btn">Show Key</button>
+            <label for="api-key-input" class="form-label" id="api-key-label">API Key</label>
+            <button id="btn-toggle-key-visibility" type="button" class="link-btn" aria-label="Show API Key">Show Key</button>
           </div>
           <div class="input-with-action">
             <input type="password" id="api-key-input" class="form-input font-mono" placeholder="gsk_..." autocomplete="off">

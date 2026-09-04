@@ -4,6 +4,7 @@
  */
 
 import { MODE_CONFIGS, MODES } from '../config/constants.js';
+import { getModifierKey } from '../utils/domUtils.js';
 
 export class StudioView {
   constructor() {
@@ -223,11 +224,12 @@ export class StudioView {
     if (this.windowModeChip && config.badge) {
       this.windowModeChip.textContent = config.badge;
     }
+    const mod = getModifierKey();
     if (this.hintSubmit && config.hint) {
-      this.hintSubmit.innerHTML = `<kbd>⌘</kbd>+<kbd>Enter</kbd> ${config.hint}`;
+      this.hintSubmit.innerHTML = `<kbd>${mod}</kbd>+<kbd>Enter</kbd> ${config.hint}`;
     }
     if (this.emptyDesc && config.emptyDesc) {
-      this.emptyDesc.innerHTML = config.emptyDesc;
+      this.emptyDesc.innerHTML = config.emptyDesc.replace(/<kbd>⌘<\/kbd>/g, `<kbd>${mod}</kbd>`);
     }
   }
 

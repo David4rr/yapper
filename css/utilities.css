@@ -63,6 +63,29 @@
   }
 }
 
+/* --- Short Viewports (<= 620px height) --- */
+@media (max-height: 620px) {
+  .main-app-content {
+    padding: 10px 0 14px 0;
+  }
+
+  .app-workspace-container {
+    gap: 8px;
+  }
+
+  .intro-headline {
+    font-size: 18px;
+  }
+
+  .intro-kicker {
+    display: none;
+  }
+
+  .window-chrome {
+    min-height: 240px;
+  }
+}
+
 /* --- Small Devices & Phones (<= 640px) --- */
 @media (max-width: 640px) {
   .main-app-content {

@@ -19,10 +19,12 @@ html {
   overflow-x: hidden;
   scroll-behavior: smooth;
   width: 100%;
+  height: 100%;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
+  height: 100%;
   min-height: 100dvh;
   min-height: -webkit-fill-available;
   display: flex;
@@ -33,7 +35,32 @@ body {
   line-height: 1.5;
   width: 100%;
   overflow-x: hidden;
+  overflow-y: auto;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Clean Minimalist Scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--border-strong);
+  border-radius: var(--radius-pill);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-secondary);
 }
 
 h1, h2, h3, h4, h5, h6 {

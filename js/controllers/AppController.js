@@ -6,6 +6,7 @@
 import { BASE_SYSTEM_PROMPT, MODE_CONFIGS, MODES, PROVIDER_DEFAULTS } from '../config/constants.js';
 import { StorageModel } from '../models/StorageModel.js';
 import { LLMService } from '../services/LLMService.js';
+import { applyPlatformShortcuts, isMac } from '../utils/domUtils.js';
 import { detectLanguage } from '../utils/langDetect.js';
 import { estimateTokens } from '../utils/tokenEstimator.js';
 export class AppController {
@@ -24,6 +25,7 @@ export class AppController {
   }
 
   init() {
+    applyPlatformShortcuts();
     this.loadSavedConfig();
     this.renderInitialUI();
     this.bindEvents();
@@ -89,7 +91,8 @@ export class AppController {
     });
     this.settingsView.bindModelSelectChange(model => this.state.set('model', model));
     this.settingsView.bindModelInputChange(model => this.state.set('model', model));
-
+    this.settingsView.bindToggleKeyVisibility();
+    this.settingsView.bindToggleModelMode();
     // History
     this.historyView.bindToggle(() => this.historyView.open());
     this.historyView.bindClose(() => this.historyView.close());
@@ -400,9 +403,7 @@ export class AppController {
   // ---------------------------------------------------------------------------
 
   handleKeyboardShortcuts(e) {
-    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-    const cmdKey = isMac ? e.metaKey : e.ctrlKey;
-
+    const cmdKey = isMac() ? e.metaKey : e.ctrlKey;
     if (cmdKey && e.key === 'Enter') {
       e.preventDefault();
       this.executeTranslation();

@@ -5,10 +5,11 @@
 
 /* --- Main Application Layout --- */
 .main-app-content {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  padding: 20px 0 28px 0;
+  min-height: 0;
+  padding: 16px 0 20px 0;
   position: relative;
   z-index: 1;
 }
@@ -20,8 +21,9 @@
   padding: 0 var(--container-pad);
   display: flex;
   flex-direction: column;
-  flex: 1;
-  gap: 16px;
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: 14px;
 }
 
 /* Compact Intro Bar */
@@ -31,6 +33,7 @@
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .intro-left {
@@ -249,8 +252,8 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 520px;
+  flex: 1 1 auto;
+  min-height: 280px;
   transition: box-shadow var(--duration-normal) var(--ease-editorial);
 }
 
@@ -319,8 +322,8 @@
 .workspace-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  flex: 1;
-  min-height: 480px;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 /* --- Split Panels --- */
@@ -329,7 +332,9 @@
   flex-direction: column;
   background: var(--bg-surface);
   position: relative;
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .panel-input {
@@ -479,18 +484,20 @@
 /* --- Textarea & Output wrappers --- */
 .textarea-wrapper,
 .output-wrapper {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   position: relative;
   background: var(--bg-surface);
+  min-height: 0;
   overflow: hidden;
 }
 
 .code-textarea {
   width: 100%;
-  flex: 1;
-  min-height: 280px;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
   padding: 16px 18px;
   border: none;
   outline: none;
@@ -500,6 +507,7 @@
   font-size: 13.5px;
   line-height: 1.6;
   font-family: var(--font-mono);
+  overflow-y: auto;
 }
 
 .code-textarea::placeholder {
@@ -515,13 +523,15 @@
 
 /* Empty State */
 .empty-state {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px 24px;
+  padding: 24px 20px;
   text-align: center;
+  overflow-y: auto;
 }
 
 .empty-icon {
@@ -568,7 +578,9 @@
 
 /* Output pre/code */
 .output-content {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
   padding: 16px 18px;
   overflow-y: auto;
   outline: none;
