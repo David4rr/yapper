@@ -12,7 +12,7 @@ Core Directives:
 4. Concise Structure: Single tasks -> 1–2 crisp imperative sentences. Multi-requirement tasks -> tight bulleted directives.
 5. Strict Output Only: Output ONLY the compiled English prompt. Absolutely NO intro, NO explanations, and NO surrounding quotation marks.`;
 
-export const TRANSLATE_SYSTEM_PROMPT = `You are an expert Indonesian-to-English translator specializing in fluent, natural, and idiomatic modern English.
+export const TRANSLATE_ID_EN_SYSTEM_PROMPT = `You are an expert Indonesian-to-English translator specializing in fluent, natural, and idiomatic modern English.
 Translate raw, casual, slang-heavy, conversational, or formal Indonesian inputs into smooth, grammatically sound, natural-sounding English.
 
 Translation Rules:
@@ -23,11 +23,60 @@ Translation Rules:
 5. Technical Terms & Loanwords: Keep established technical jargon, library/framework names, and code identifiers exact while translating the surrounding context fluidly.
 6. Strict Output Only: Output ONLY the translated English text. Do NOT include explanations, phonetic transcriptions, alternative options, notes, or surrounding quotes.`;
 
+export const TRANSLATE_EN_ID_SYSTEM_PROMPT = `You are an expert English-to-Indonesian translator specializing in natural, fluent, and idiomatic modern Indonesian.
+Translate raw, formal, technical, or conversational English inputs into smooth, authentic, natural-sounding Indonesian.
+
+Translation Rules:
+1. Natural & Anti-Translationese: NEVER produce stiff, robotic, or literal "bahasa terjemahan" (avoid awkward overused constructs like "dalam rangka untuk", "silakan perhatikan bahwa", "adalah merupakan", or awkward passive voice). Translate the authentic meaning and intent into how real Indonesians write and speak.
+2. Idiomatic Adaptation: Seamlessly adapt English idioms, phrasal verbs, and metaphors into their natural Indonesian equivalents or contextual meanings (e.g., "hit the ground running", "under the hood", "cut corners", "rule of thumb").
+3. Register & Tone Matching: Match the register of the source text:
+   - Casual / Conversational -> Smooth, contemporary, natural Indonesian (avoiding archaic words or hyper-formal phrasing).
+   - Technical / Developer -> Clean, modern developer Indonesian.
+   - Professional / Business -> Polished, clear, contemporary Indonesian.
+4. Technical Terms & Code Preservation: Keep standard technical terms, code snippets, library/framework names, API endpoints, variable names, and established tech loanwords in their original English (e.g., "endpoint", "payload", "pipeline", "hook", "deploy", "runtime", "thread", "middleware") instead of forcing awkward, unfamiliar translations.
+5. Grammatical Flow: Ensure fluid sentence cadence, appropriate affixation (imbuhan), and natural discourse flow.
+6. Strict Output Only: Output ONLY the translated Indonesian text. Absolutely NO introductory phrases, NO notes, NO vocabulary breakdowns, and NO surrounding quotation marks.`;
+
+export const TRANSLATE_SYSTEM_PROMPT = TRANSLATE_ID_EN_SYSTEM_PROMPT;
 export const BASE_SYSTEM_PROMPT = PROMPT_SYSTEM_PROMPT;
 
 export const MODES = {
   PROMPT: 'prompt',
   TRANSLATE: 'translate'
+};
+
+export const TRANSLATE_DIRECTIONS = {
+  ID_EN: 'id-en',
+  EN_ID: 'en-id'
+};
+
+export const DIRECTION_CONFIGS = {
+  [TRANSLATE_DIRECTIONS.ID_EN]: {
+    direction: TRANSLATE_DIRECTIONS.ID_EN,
+    inputLang: 'ID',
+    outputLang: 'EN',
+    windowTitleInput: 'raw-input.id',
+    windowTitleOutput: 'natural-translation.en',
+    outputHeading: 'Fluent English Translation',
+    submitText: 'Translate to English',
+    badge: 'Fluent & Idiomatic',
+    hint: 'Translate',
+    emptyDesc: 'Enter raw Indonesian text on the left panel, then press <kbd>⌘</kbd> + <kbd>Enter</kbd> to translate into fluent, natural English.',
+    systemPrompt: TRANSLATE_ID_EN_SYSTEM_PROMPT
+  },
+  [TRANSLATE_DIRECTIONS.EN_ID]: {
+    direction: TRANSLATE_DIRECTIONS.EN_ID,
+    inputLang: 'EN',
+    outputLang: 'ID',
+    windowTitleInput: 'raw-input.en',
+    windowTitleOutput: 'fluent-translation.id',
+    outputHeading: 'Fluent Indonesian Translation',
+    submitText: 'Translate to Indonesian',
+    badge: 'Alami & Kontekstual',
+    hint: 'Translate',
+    emptyDesc: 'Enter English text on the left panel, then press <kbd>⌘</kbd> + <kbd>Enter</kbd> to translate into fluent, natural Indonesian.',
+    systemPrompt: TRANSLATE_EN_ID_SYSTEM_PROMPT
+  }
 };
 
 export const MODE_CONFIGS = {
@@ -49,15 +98,15 @@ export const MODE_CONFIGS = {
     id: 'translate',
     name: 'Natural Translation',
     shortName: 'Translate',
-    kicker: '[ NATURAL TRANSLATION · FLUENT & GRAMMATICAL ]',
-    headline: 'Translate casual Indonesian into fluent, natural English.',
+    kicker: '[ NATURAL TRANSLATION · BIDIRECTIONAL FLUENT ]',
+    headline: 'Translate seamlessly between Indonesian and natural English.',
     outputHeading: 'Fluent English Translation',
     submitText: 'Translate to English',
     windowTitle: 'natural-translation.en',
     badge: 'Fluent & Idiomatic',
     hint: 'Translate',
-    emptyDesc: 'Enter raw Indonesian text on the left panel, then press <kbd>⌘</kbd> + <kbd>Enter</kbd> to translate into fluent, natural English.',
-    systemPrompt: TRANSLATE_SYSTEM_PROMPT
+    emptyDesc: 'Enter Indonesian or English on the left panel, then press <kbd>⌘</kbd> + <kbd>Enter</kbd> to translate naturally.',
+    systemPrompt: TRANSLATE_ID_EN_SYSTEM_PROMPT
   }
 };
 export const PROVIDER_DEFAULTS = {

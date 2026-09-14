@@ -38,12 +38,14 @@ export function applyPlatformShortcuts(root = document) {
     const title = el.getAttribute('title');
     if (title && title.includes('⌘')) {
       el.setAttribute('title', title.replace(/⌘⇧C/g, 'Ctrl+Shift+C')
+                                   .replace(/⌘⇧X/g, 'Ctrl+Shift+X')
                                    .replace(/⌘⏎/g, 'Ctrl+Enter')
                                    .replace(/⌘/g, 'Ctrl+'));
     }
     const ariaLabel = el.getAttribute('aria-label');
     if (ariaLabel && ariaLabel.includes('⌘')) {
       el.setAttribute('aria-label', ariaLabel.replace(/⌘⇧C/g, 'Ctrl+Shift+C')
+                                             .replace(/⌘⇧X/g, 'Ctrl+Shift+X')
                                              .replace(/⌘⏎/g, 'Ctrl+Enter')
                                              .replace(/⌘/g, 'Ctrl+'));
     }
@@ -59,6 +61,8 @@ export function applyPlatformShortcuts(root = document) {
       kbd.textContent = 'Ctrl+Enter';
     } else if (text === '⌘⇧C') {
       kbd.textContent = 'Ctrl+Shift+C';
+    } else if (text === '⌘⇧X') {
+      kbd.textContent = 'Ctrl+Shift+X';
     } else if (text && text.startsWith('⌘')) {
       kbd.textContent = text.replace('⌘', 'Ctrl+');
     }

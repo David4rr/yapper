@@ -54,7 +54,10 @@ export class HistoryView {
       const date = new Date(item.timestamp);
       const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const isTranslate = item.mode === 'translate';
-      const modeLabel = isTranslate ? 'TRANSLATE' : 'COMPRESSED';
+      let modeLabel = 'COMPRESSED';
+      if (isTranslate) {
+        modeLabel = item.direction === 'en-id' ? 'EN → ID' : 'ID → EN';
+      }
       const savings = item.inTokens > 0 ? Math.round(((item.inTokens - item.outTokens) / item.inTokens) * 100) : 0;
 
       return `

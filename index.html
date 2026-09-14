@@ -122,7 +122,14 @@
           </div>
           <div class="window-title font-mono">
             <span id="window-title-input">raw-input.id</span>
-            <span class="title-sep">&rarr;</span>
+            <button type="button" id="btn-swap-direction" class="title-swap-btn" title="Swap direction / text (⌘⇧X)" aria-label="Swap translation direction">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="17 1 21 5 17 9"></polyline>
+                <path d="M3 5h18"></path>
+                <polyline points="7 23 3 19 7 15"></polyline>
+                <path d="M21 19H3"></path>
+              </svg>
+            </button>
             <span id="window-title-output">compressed-prompt.en</span>
           </div>
           <div class="window-meta font-mono">
@@ -185,7 +192,7 @@
           <div class="panel panel-output" aria-labelledby="output-heading">
             <div class="panel-header">
               <div class="panel-meta">
-                <span class="badge-lang pastel-green font-mono">EN</span>
+                <span id="output-lang-badge" class="badge-lang pastel-green font-mono">EN</span>
                 <h2 id="output-heading" class="panel-heading">Compressed System Prompt</h2>
               </div>
               <div class="panel-stats font-mono" id="output-stats">
@@ -272,6 +279,7 @@
         <span class="shortcut-item"><kbd>⌘K</kbd> Settings</span>
         <span class="shortcut-item"><kbd>⌘H</kbd> History</span>
         <span class="shortcut-item"><kbd>⌘M</kbd> Mode</span>
+        <span class="shortcut-item"><kbd>⌘⇧X</kbd> Swap</span>
         <span class="shortcut-item"><kbd>⌘⏎</kbd> Execute</span>
         <span class="shortcut-item"><kbd>⌘⇧C</kbd> Copy</span>
       </div>

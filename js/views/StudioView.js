@@ -3,7 +3,7 @@
  * Manages the core workspace UI (Input, Output, Metrics Telemetry, Actions, Mode Switcher)
  */
 
-import { MODE_CONFIGS, MODES } from '../config/constants.js';
+import { DIRECTION_CONFIGS, MODE_CONFIGS, MODES, TRANSLATE_DIRECTIONS } from '../config/constants.js';
 import { getModifierKey } from '../utils/domUtils.js';
 
 export class StudioView {
@@ -23,6 +23,9 @@ export class StudioView {
     this.hintSubmit = document.getElementById('hint-submit');
     this.emptyDesc = document.getElementById('empty-desc');
 
+    // Direction Swap
+    this.btnSwapDirection = document.getElementById('btn-swap-direction');
+
     // Inputs & Metrics & Language Auto-detect
     this.rawInput = document.getElementById('raw-input');
     this.inputLangBadge = document.getElementById('input-lang-badge');
@@ -32,6 +35,7 @@ export class StudioView {
     this.inputTokens = document.getElementById('input-tokens');
     this.inputChars = document.getElementById('input-chars');
     // Output & Metrics
+    this.outputLangBadge = document.getElementById('output-lang-badge');
     this.emptyState = document.getElementById('empty-state');
     this.outputContent = document.getElementById('output-content');
     this.outputText = document.getElementById('output-text');
@@ -212,24 +216,70 @@ export class StudioView {
     if (this.introHeadline && config.headline) {
       this.introHeadline.textContent = config.headline;
     }
-    if (this.outputHeading && config.outputHeading) {
-      this.outputHeading.textContent = config.outputHeading;
-    }
-    if (this.submitBtnText && config.submitText) {
-      this.submitBtnText.textContent = config.submitText;
-    }
-    if (this.windowTitleOutput && config.windowTitle) {
-      this.windowTitleOutput.textContent = config.windowTitle;
-    }
-    if (this.windowModeChip && config.badge) {
-      this.windowModeChip.textContent = config.badge;
-    }
+
+    this.updateDirectionUI({ mode, direction: TRANSLATE_DIRECTIONS.ID_EN });
+  }
+
+  updateDirectionUI({ mode = MODES.PROMPT, direction = TRANSLATE_DIRECTIONS.ID_EN, langInfo = {} }) {
     const mod = getModifierKey();
-    if (this.hintSubmit && config.hint) {
-      this.hintSubmit.innerHTML = `<kbd>${mod}</kbd>+<kbd>Enter</kbd> ${config.hint}`;
+
+    if (mode === MODES.PROMPT) {
+      if (this.outputLangBadge) {
+        this.outputLangBadge.textContent = 'EN';
+        this.outputLangBadge.className = 'badge-lang pastel-green font-mono';
+        this.outputLangBadge.title = 'Output: Optimized English Prompt';
+      }
+      if (this.outputHeading) {
+        this.outputHeading.textContent = MODE_CONFIGS[MODES.PROMPT].outputHeading;
+      }
+      if (this.windowTitleOutput) {
+        this.windowTitleOutput.textContent = MODE_CONFIGS[MODES.PROMPT].windowTitle;
+      }
+      if (this.submitBtnText) {
+        this.submitBtnText.textContent = MODE_CONFIGS[MODES.PROMPT].submitText;
+      }
+      if (this.windowModeChip) {
+        this.windowModeChip.textContent = MODE_CONFIGS[MODES.PROMPT].badge;
+      }
+      if (this.emptyDesc) {
+        this.emptyDesc.innerHTML = MODE_CONFIGS[MODES.PROMPT].emptyDesc.replace(/<kbd>⌘<\/kbd>/g, `<kbd>${mod}</kbd>`);
+      }
+      if (this.hintSubmit) {
+        this.hintSubmit.innerHTML = `<kbd>${mod}</kbd>+<kbd>Enter</kbd> ${MODE_CONFIGS[MODES.PROMPT].hint}`;
+      }
+      return;
     }
-    if (this.emptyDesc && config.emptyDesc) {
-      this.emptyDesc.innerHTML = config.emptyDesc.replace(/<kbd>⌘<\/kbd>/g, `<kbd>${mod}</kbd>`);
+
+    // Natural Translation Mode: Bidirectional styling
+    const dirConfig = DIRECTION_CONFIGS[direction] || DIRECTION_CONFIGS[TRANSLATE_DIRECTIONS.ID_EN];
+    const isEnToId = direction === TRANSLATE_DIRECTIONS.EN_ID;
+
+    if (this.outputLangBadge) {
+      this.outputLangBadge.textContent = dirConfig.outputLang;
+      this.outputLangBadge.className = `badge-lang font-mono ${isEnToId ? 'pastel-yellow' : 'pastel-green'}`;
+      this.outputLangBadge.title = `Target Language: ${isEnToId ? 'Indonesian' : 'English'}`;
+      this.outputLangBadge.classList.remove('badge-pop');
+      void this.outputLangBadge.offsetWidth;
+      this.outputLangBadge.classList.add('badge-pop');
+    }
+
+    if (this.outputHeading) {
+      this.outputHeading.textContent = dirConfig.outputHeading;
+    }
+    if (this.windowTitleOutput) {
+      this.windowTitleOutput.textContent = dirConfig.windowTitleOutput;
+    }
+    if (this.submitBtnText) {
+      this.submitBtnText.textContent = dirConfig.submitText;
+    }
+    if (this.windowModeChip) {
+      this.windowModeChip.textContent = dirConfig.badge;
+    }
+    if (this.emptyDesc) {
+      this.emptyDesc.innerHTML = dirConfig.emptyDesc.replace(/<kbd>⌘<\/kbd>/g, `<kbd>${mod}</kbd>`);
+    }
+    if (this.hintSubmit && dirConfig.hint) {
+      this.hintSubmit.innerHTML = `<kbd>${mod}</kbd>+<kbd>Enter</kbd> ${dirConfig.hint}`;
     }
   }
 
@@ -310,6 +360,12 @@ export class StudioView {
           if (mode) handler(mode);
         });
       });
+    }
+  }
+
+  bindSwapDirection(handler) {
+    if (this.btnSwapDirection) {
+      this.btnSwapDirection.addEventListener('click', handler);
     }
   }
 }

@@ -3,7 +3,16 @@
  * Lean event orchestrator: bridges Models and Views, owns no DOM, owns no UI strings.
  */
 
-import { BASE_SYSTEM_PROMPT, MODE_CONFIGS, MODES, PROVIDER_DEFAULTS } from '../config/constants.js';
+import {
+  BASE_SYSTEM_PROMPT,
+  DIRECTION_CONFIGS,
+  MODE_CONFIGS,
+  MODES,
+  PROVIDER_DEFAULTS,
+  TRANSLATE_DIRECTIONS,
+  TRANSLATE_EN_ID_SYSTEM_PROMPT,
+  TRANSLATE_ID_EN_SYSTEM_PROMPT
+} from '../config/constants.js';
 import { StorageModel } from '../models/StorageModel.js';
 import { LLMService } from '../services/LLMService.js';
 import { applyPlatformShortcuts, isMac } from '../utils/domUtils.js';
@@ -22,6 +31,7 @@ export class AppController {
     this.isFetchingModels = false;
     this.fetchDebounceTimer = null;
     this._abortController = null; // runtime handle — not part of serializable state
+    this.manualDirection = null; // runtime direction override ('id-en' | 'en-id')
   }
 
   init() {
@@ -67,11 +77,15 @@ export class AppController {
   bindEvents() {
     // Studio
     this.studioView.bindInput(text => this.updateInputMetrics(text));
-    this.studioView.bindClear(() => this.studioView.clearAll());
+    this.studioView.bindClear(() => {
+      this.manualDirection = null;
+      this.studioView.clearAll();
+    });
     this.studioView.bindSubmit(() => this.executeTranslation());
     this.studioView.bindCopy(() => this.handleCopy());
     this.studioView.bindDownload(() => this.handleExport());
     this.studioView.bindModeChange(mode => this.handleModeChange(mode));
+    this.studioView.bindSwapDirection(() => this.handleSwapDirection());
 
     // Settings
     this.settingsView.bindToggle(() => this.settingsView.open());
@@ -104,20 +118,49 @@ export class AppController {
   }
 
   // ---------------------------------------------------------------------------
-  // Metrics
+  // Direction Resolution & Metrics
   // ---------------------------------------------------------------------------
+
+  resolveDirection(text = null) {
+    if (this.state.get('mode') !== MODES.TRANSLATE) {
+      return TRANSLATE_DIRECTIONS.ID_EN;
+    }
+    if (this.manualDirection) {
+      return this.manualDirection;
+    }
+    const targetText = text !== null ? text : this.studioView.getRawInput();
+    const langInfo = detectLanguage(targetText);
+    return (langInfo.code === 'EN' || !langInfo.isIndonesian)
+      ? TRANSLATE_DIRECTIONS.EN_ID
+      : TRANSLATE_DIRECTIONS.ID_EN;
+  }
 
   updateInputMetrics(text) {
     const langInfo = detectLanguage(text);
-    const tokens = estimateTokens(text, langInfo.isIndonesian ? 'id' : 'en');
+    const mode = this.state.get('mode') || MODES.PROMPT;
+    const direction = this.resolveDirection(text);
+
+    const effectiveInLang = (mode === MODES.TRANSLATE && direction === TRANSLATE_DIRECTIONS.EN_ID)
+      ? 'en'
+      : (langInfo.isIndonesian ? 'id' : 'en');
+
+    const tokens = estimateTokens(text, effectiveInLang);
     const chars = text ? text.length : 0;
     this.studioView.renderInputMetrics(tokens, chars);
     this.studioView.renderLanguageBadge(langInfo);
+    this.studioView.updateDirectionUI({ mode, direction, langInfo });
   }
 
   updateOutputMetrics(outputText, startTime = null) {
-    const inTokens = estimateTokens(this.studioView.getRawInput(), 'id');
-    const outTokens = estimateTokens(outputText, 'en');
+    const rawInput = this.studioView.getRawInput();
+    const mode = this.state.get('mode') || MODES.PROMPT;
+    const direction = this.resolveDirection(rawInput);
+
+    const inLang = (mode === MODES.TRANSLATE && direction === TRANSLATE_DIRECTIONS.EN_ID) ? 'en' : 'id';
+    const outLang = (mode === MODES.TRANSLATE && direction === TRANSLATE_DIRECTIONS.EN_ID) ? 'id' : 'en';
+
+    const inTokens = estimateTokens(rawInput, inLang);
+    const outTokens = estimateTokens(outputText, outLang);
     const elapsed = startTime ? Math.round(performance.now() - startTime) : null;
     this.studioView.renderOutputMetrics(inTokens, outTokens, elapsed);
   }
@@ -254,12 +297,38 @@ export class AppController {
 
   handleModeChange(mode) {
     if (this.state.get('mode') === mode) return;
+    this.manualDirection = null;
     this.state.set('mode', mode);
     this.studioView.setMode(mode);
     const config = this.state.getAll();
     StorageModel.saveConfig(config, config.storageStrategy);
     const modeName = mode === MODES.TRANSLATE ? 'Natural Translation' : 'System Prompt';
     this.toastView.show(`Mode aktif: ${modeName}`, 'normal');
+    this.updateInputMetrics(this.studioView.getRawInput());
+  }
+
+  handleSwapDirection() {
+    const rawInput = this.studioView.getRawInput();
+    const outputText = this.studioView.getOutputText();
+
+    if (outputText) {
+      this.manualDirection = null; // reset lock so auto-detect recalculates on swapped content
+      this.studioView.setRawInput(outputText);
+      this.studioView.showOutput(rawInput);
+      this.updateInputMetrics(outputText);
+      this.updateOutputMetrics(rawInput);
+      this.toastView.show('Teks dan arah terjemahan ditukar!', 'normal');
+    } else {
+      const currentDir = this.resolveDirection(rawInput);
+      this.manualDirection = currentDir === TRANSLATE_DIRECTIONS.EN_ID
+        ? TRANSLATE_DIRECTIONS.ID_EN
+        : TRANSLATE_DIRECTIONS.EN_ID;
+      this.updateInputMetrics(rawInput);
+      const label = this.manualDirection === TRANSLATE_DIRECTIONS.EN_ID
+        ? 'English → Indonesia'
+        : 'Indonesia → English';
+      this.toastView.show(`Arah terjemahan: ${label}`, 'normal');
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -333,7 +402,7 @@ export class AppController {
   async executeTranslation() {
     const rawInput = this.studioView.getRawInput().trim();
     if (!rawInput) {
-      this.toastView.show('Ketikkan input bahasa Indonesia terlebih dahulu!', 'error');
+      this.toastView.show('Ketikkan teks input terlebih dahulu!', 'error');
       this.studioView.focusInput();
       return;
     }
@@ -343,7 +412,19 @@ export class AppController {
     const model = this.state.get('model');
     const customBaseUrl = this.state.get('customBaseUrl');
     const mode = this.state.get('mode') || MODES.PROMPT;
-    const systemPrompt = MODE_CONFIGS[mode]?.systemPrompt || BASE_SYSTEM_PROMPT;
+
+    let systemPrompt;
+    let direction = TRANSLATE_DIRECTIONS.ID_EN;
+
+    if (mode === MODES.TRANSLATE) {
+      direction = this.resolveDirection(rawInput);
+      systemPrompt = direction === TRANSLATE_DIRECTIONS.EN_ID
+        ? TRANSLATE_EN_ID_SYSTEM_PROMPT
+        : TRANSLATE_ID_EN_SYSTEM_PROMPT;
+    } else {
+      systemPrompt = MODE_CONFIGS[mode]?.systemPrompt || BASE_SYSTEM_PROMPT;
+    }
+
     if (!apiKey && provider !== 'custom') {
       this.toastView.show('Masukkan API Key Anda di Pengaturan untuk memproses prompt!', 'error');
       this.settingsView.open();
@@ -372,15 +453,31 @@ export class AppController {
         signal: this._abortController.signal
       });
 
-      const inTokens = estimateTokens(rawInput, 'id');
-      const outTokens = estimateTokens(finalResult, 'en');
+      const inLang = (mode === MODES.TRANSLATE && direction === TRANSLATE_DIRECTIONS.EN_ID) ? 'en' : 'id';
+      const outLang = (mode === MODES.TRANSLATE && direction === TRANSLATE_DIRECTIONS.EN_ID) ? 'id' : 'en';
 
-      this.historyModel.add({ rawInput, outputText: finalResult, inTokens, outTokens, mode });
+      const inTokens = estimateTokens(rawInput, inLang);
+      const outTokens = estimateTokens(finalResult, outLang);
+
+      this.historyModel.add({
+        rawInput,
+        outputText: finalResult,
+        inTokens,
+        outTokens,
+        mode,
+        direction: mode === MODES.TRANSLATE ? direction : undefined
+      });
       this.historyView.render(this.historyModel.getAll());
       this.updateOutputMetrics(finalResult, startTime);
-      const successMsg = mode === MODES.TRANSLATE
-        ? 'Teks berhasil diterjemahkan ke bahasa Inggris alami!'
-        : 'Prompt berhasil dikompresi & diterjemahkan!';
+
+      let successMsg;
+      if (mode === MODES.TRANSLATE) {
+        successMsg = direction === TRANSLATE_DIRECTIONS.EN_ID
+          ? 'Teks berhasil diterjemahkan ke bahasa Indonesia alami!'
+          : 'Teks berhasil diterjemahkan ke bahasa Inggris alami!';
+      } else {
+        successMsg = 'Prompt berhasil dikompresi & diterjemahkan!';
+      }
       this.toastView.show(successMsg, 'success');
     } catch (err) {
       if (err.name === 'AbortError') {
@@ -427,6 +524,14 @@ export class AppController {
       const nextMode = currentMode === MODES.PROMPT ? MODES.TRANSLATE : MODES.PROMPT;
       this.handleModeChange(nextMode);
     }
+
+    // Direction/text swap: ⌘⇧X or Ctrl+Shift+X
+    const isX = (e.key && e.key.toLowerCase() === 'x') || e.code === 'KeyX';
+    if (cmdKey && e.shiftKey && isX) {
+      e.preventDefault();
+      this.handleSwapDirection();
+    }
+
     const isCopyKey = (e.key && e.key.toLowerCase() === 'c') || e.code === 'KeyC';
     if (cmdKey && isCopyKey) {
       const hasOutput = Boolean(this.studioView.getOutputText());
@@ -457,6 +562,7 @@ export class AppController {
         if (this._abortController) {
           this._abortController.abort();
         }
+        this.manualDirection = null;
         this.studioView.clearAll();
       }
     }
