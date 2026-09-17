@@ -20,6 +20,10 @@
 
 /* --- Medium Devices & Tablets (<= 860px) --- */
 @media (max-width: 860px) {
+  html, body {
+    height: auto;
+  }
+
   .workspace-intro {
     flex-direction: column;
     align-items: stretch;
