@@ -449,28 +449,32 @@ export class AppController {
         systemPrompt,
         temperature,
         onChunk: (_chunk, accumulated) => {
-          this.studioView.showOutput(accumulated);
-          this.updateOutputMetrics(accumulated, startTime);
+          const sanitized = accumulated ? accumulated.replace(/[\u2014\u2013]/g, ', ').replace(/\s+,\s*/g, ', ').replace(/,\s*,+/g, ',') : accumulated;
+          this.studioView.showOutput(sanitized);
+          this.updateOutputMetrics(sanitized, startTime);
         },
         signal: this._abortController.signal
       });
+
+      const sanitizedResult = finalResult ? finalResult.replace(/[\u2014\u2013]/g, ', ').replace(/\s+,\s*/g, ', ').replace(/,\s*,+/g, ',') : finalResult;
+      this.studioView.showOutput(sanitizedResult);
 
       const inLang = (mode === MODES.TRANSLATE && direction === TRANSLATE_DIRECTIONS.EN_ID) ? 'en' : 'id';
       const outLang = (mode === MODES.TRANSLATE && direction === TRANSLATE_DIRECTIONS.EN_ID) ? 'id' : 'en';
 
       const inTokens = estimateTokens(rawInput, inLang);
-      const outTokens = estimateTokens(finalResult, outLang);
+      const outTokens = estimateTokens(sanitizedResult, outLang);
 
       this.historyModel.add({
         rawInput,
-        outputText: finalResult,
+        outputText: sanitizedResult,
         inTokens,
         outTokens,
         mode,
         direction: mode === MODES.TRANSLATE ? direction : undefined
       });
       this.historyView.render(this.historyModel.getAll());
-      this.updateOutputMetrics(finalResult, startTime);
+      this.updateOutputMetrics(sanitizedResult, startTime);
 
       let successMsg;
       if (mode === MODES.TRANSLATE) {
