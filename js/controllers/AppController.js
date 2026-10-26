@@ -439,6 +439,7 @@ export class AppController {
     this._abortController = new AbortController();
 
     try {
+      const temperature = mode === MODES.TRANSLATE ? 0.35 : 0.2;
       const finalResult = await LLMService.streamCompression({
         provider,
         model,
@@ -446,6 +447,7 @@ export class AppController {
         customBaseUrl,
         rawInput,
         systemPrompt,
+        temperature,
         onChunk: (_chunk, accumulated) => {
           this.studioView.showOutput(accumulated);
           this.updateOutputMetrics(accumulated, startTime);

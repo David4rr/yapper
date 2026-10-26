@@ -25,12 +25,54 @@
   <meta name="twitter:title" content="YAPPER — Prompt Compression & Translation Engine">
   <meta name="twitter:description" content="Transform informal Indonesian into dense English system prompts and fluent translations with zero token fluff. 100% client-side private.">
   <meta name="twitter:image" content="https://yapper-2m5.pages.dev/logo.png">
-  <!-- Premium Typographic Fonts: Instrument Serif, Newsreader, Geist Sans, Geist Mono -->
+  <!-- Critical Anti-FOUC & Baseline Style: Ensures zero layout jumps and instant clean paint -->
+  <style>
+    html, body {
+      background-color: #F7F6F3;
+      color: #111111;
+      margin: 0;
+      padding: 0;
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    /* Immediately suppress overlays, modals, and drawers from document flow before CSS evaluates */
+    .modal-backdrop:not(.open),
+    .confirm-modal-backdrop:not(.open),
+    .drawer:not(.open),
+    .drawer-backdrop:not(.open),
+    [hidden] {
+      display: none !important;
+    }
+    /* Constrain raw SVGs and replaced images from blowing up to browser default 300px */
+    svg {
+      max-width: 100%;
+      height: auto;
+    }
+    .brand-logo {
+      height: 32px;
+      width: auto;
+    }
+    .btn-ghost-icon svg,
+    .btn-settings-pill svg,
+    .mode-icon,
+    .title-swap-btn svg,
+    .footer-shortcuts svg,
+    .btn-text-action svg {
+      width: 18px;
+      height: 18px;
+    }
+  </style>
+
+  <!-- Local Production Stylesheet Loaded First -->
+  <link rel="preload" href="css/main.css" as="style">
+  <link rel="stylesheet" href="css/main.css">
+
+  <!-- Preconnect & Non-blocking Font Loading with Instant Fallback -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="css/main.css">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+  </noscript>
   <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
 </head>
 <body>
@@ -42,7 +84,7 @@
     <div class="header-container">
       <div class="brand-group">
         <a href="#" class="brand-link" aria-label="Yapper Engine">
-          <img src="logo.svg" alt="YAPPER — Compression Engine" class="brand-logo">
+          <img src="logo.svg" alt="YAPPER — Compression Engine" class="brand-logo" width="51.6" height="32">
         </a>
       </div>
 

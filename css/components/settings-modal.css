@@ -17,12 +17,14 @@
   justify-content: center;
   padding: 20px;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity var(--duration-normal) var(--ease-editorial);
+  transition: opacity var(--duration-normal) var(--ease-editorial), visibility var(--duration-normal) var(--ease-editorial);
 }
 
 .modal-backdrop.open {
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
 }
 
