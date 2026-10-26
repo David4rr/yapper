@@ -1,6 +1,6 @@
 {
   "name": "yapper",
-  "version": "1.0.0",
+  "version": "1.3.0",
   "description": "Token Compression & Prompt Translation Engine",
   "scripts": {
     "build": "bun build js/app.js --outfile app.js --target browser --minify && bun build css/index.css --outfile css/main.css --minify",
